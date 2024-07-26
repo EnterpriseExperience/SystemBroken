@@ -3488,8 +3488,6 @@ plr.CharacterAdded:Connect(function(x)
 		ChangeToggleColor(Fly_Button)
 		flying = false
 		Fly_Pad.Visible = false
-		KeyDownFunction:Disconnect()
-		KeyUpFunction:Disconnect()
 		SendNotify("System Broken","Fly was automatically disabled due to your character respawn",5)
 	end
 	x.Humanoid.Died:Connect(function()
@@ -3498,41 +3496,6 @@ plr.CharacterAdded:Connect(function(x)
 			x["RagdollMe"].Disabled = false
 		end)
 	end)
-	task.wait(1)
-	local appearance = players:GetCharacterAppearanceAsync(plr.UserId)
-	local original_accs = {}
-	local accs = {}
-	for i,acc in pairs(appearance:GetChildren()) do --Save original accessoryes
-		if acc:IsA("Accessory") then
-			table.insert(original_accs, acc.Name)
-		end
-	end
-	for i,acc in pairs(plr.Character:GetChildren()) do --Save player accessoryes
-		if acc:IsA("Accessory") then
-			table.insert(accs, acc.Name)
-		end
-	end
-	
-	local original_ammount = #original_accs
-	local ammount = #accs
-	if ammount == original_ammount then
-		local count = 0
-		for i,v in pairs(accs) do
-			if table.find(original_accs, v) then
-				count = count+1
-			end
-		end
-		if not (count == original_ammount) then
-			SysBroker:Destroy()
-			SendNotify("System Broken","An unexpected error occurred, re-joining...")
-			game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
-		end
-	else
-		SysBroker:Destroy()
-		SendNotify("System Broken","An unexpected error occurred, re-joining...")
-		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
-	end
-	appearance:Destroy()
 end)
 
 OpenClose.MouseButton1Click:Connect(function()
