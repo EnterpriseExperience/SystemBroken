@@ -308,7 +308,6 @@ local ClickTargetTool_Button = Instance.new("ImageButton")
 local TargetName_Input = Instance.new("TextBox")
 local UserIDTargetLabel = Instance.new("TextLabel")
 local ViewTarget_Button = Instance.new("TextButton")
-local FlingTarget_Button = Instance.new("TextButton")
 local FocusTarget_Button = Instance.new("TextButton")
 local BenxTarget_Button = Instance.new("TextButton")
 local PushTarget_Button = Instance.new("TextButton")
@@ -868,21 +867,6 @@ ViewTarget_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
 ViewTarget_Button.TextScaled = true
 ViewTarget_Button.TextSize = 14.000
 ViewTarget_Button.TextWrapped = true
-
-FlingTarget_Button.Name = "FlingTarget_Button"
-FlingTarget_Button.Parent = Target_Section
-FlingTarget_Button.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-FlingTarget_Button.BackgroundTransparency = 0.500
-FlingTarget_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-FlingTarget_Button.BorderSizePixel = 0
-FlingTarget_Button.Position = UDim2.new(0, 25, 0, 150)
-FlingTarget_Button.Size = UDim2.new(0, 150, 0, 30)
-FlingTarget_Button.Font = Enum.Font.Oswald
-FlingTarget_Button.Text = "Fling"
-FlingTarget_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-FlingTarget_Button.TextScaled = true
-FlingTarget_Button.TextSize = 14.000
-FlingTarget_Button.TextWrapped = true
 
 FocusTarget_Button.Name = "FocusTarget_Button"
 FocusTarget_Button.Parent = Target_Section
@@ -1762,7 +1746,6 @@ CreateClicker(Respawn_Button)
 CreateClicker(FlySpeed_Button)
 
 CreateToggle(ViewTarget_Button)
-CreateToggle(FlingTarget_Button)
 CreateToggle(FocusTarget_Button)
 CreateToggle(BenxTarget_Button)
 CreateToggle(HeadsitTarget_Button)
@@ -1847,10 +1830,6 @@ local function UpdateTarget(player)
 		UserIDTargetLabel.Text = "UserID: \nDisplay: \nJoined: "
 		TargetImage.Image = "rbxassetid://10818605405"
 		TargetedPlayer = nil
-		if FlingTarget_Button.Ticket_Asset.ImageColor3 == Color3.fromRGB(0,255,0) then
-			FlingTarget_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
-			TouchFling_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
-		end
 		ViewTarget_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
 		FocusTarget_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
 		BenxTarget_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
@@ -2835,8 +2814,6 @@ CMDX_Button.MouseButton1Click:Connect(function()
 end)
 
 Explode_Button.MouseButton1Click:Connect(function()
-	ToggleRagdoll(false)
-	task.wait()
 	plr.Character.Humanoid:ChangeState(0)
 	local bav = Instance.new("BodyAngularVelocity")
 	bav.Parent = GetRoot(plr)
