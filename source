@@ -1,7 +1,7 @@
 --RELOAD GUI
 if game.CoreGui:FindFirstChild("SysBroker") then
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = "System Broken",Text = "GUI Already loaded, rejoin to re-execute",Duration = 5;})
-	return
+	return 
 end
 local version = 2
 --VARIABLES
@@ -139,73 +139,6 @@ local function Touch(x,root)
 	end)
 end
 
-
-local function GetPush()
-	local TempPush = nil
-	pcall(function()
-		if plr.Backpack:FindFirstChild("Push") then
-			PushTool = plr.Backpack.Push
-			PushTool.Parent = plr.Character
-			TempPush = PushTool
-		end
-		for i,v in pairs(Players:GetPlayers()) do
-			if v.Character:FindFirstChild("Push") then
-				TempPush = v.Character.Push
-			end
-		end
-	end)
-	return TempPush
-end
-
-local function CheckPotion()
-	if plr.Backpack:FindFirstChild("potion") then
-		PotionTool = plr.Backpack:FindFirstChild("potion")
-		return true
-	elseif plr.Character:FindFirstChild("potion") then
-		PotionTool = plr.Character:FindFirstChild("potion")
-		return true
-	else
-		return false
-	end
-end
-
-local function Push(Target)
-	local Push = GetPush()
-	local FixTool = nil
-	if Push ~= nil then
-		local args = {[1] = Target.Character}
-		GetPush().PushTool:FireServer(unpack(args))
-	end
-	if plr.Character:FindFirstChild("Push") then
-		plr.Character.Push.Parent = plr.Backpack
-	end
-	if plr.Character:FindFirstChild("ModdedPush") then
-		FixTool = plr.Character:FindFirstChild("ModdedPush")
-		FixTool.Parent = plr.Backpack
-		FixTool.Parent = plr.Character
-	end
-	if plr.Character:FindFirstChild("ClickTarget") then
-		FixTool = plr.Character:FindFirstChild("ClickTarget")
-		FixTool.Parent = plr.Backpack
-		FixTool.Parent = plr.Character
-	end
-	if plr.Character:FindFirstChild("potion") then
-		FixTool = plr.Character:FindFirstChild("potion")
-		FixTool.Parent = plr.Backpack
-		FixTool.Parent = plr.Character
-	end
-end
-
-local function ToggleRagdoll(bool)
-	pcall(function()
-		plr.Character["Falling down"].Disabled = bool
-		plr.Character["Swimming"].Disabled = bool
-		plr.Character["StartRagdoll"].Disabled = bool
-		plr.Character["Pushed"].Disabled = bool
-		plr.Character["RagdollMe"].Disabled = bool
-	end)
-end
-
 local function ToggleVoidProtection(bool)
 	if bool then
 		game.Workspace.FallenPartsDestroyHeight = 0/0
@@ -334,6 +267,11 @@ local PirateAnim_Button = Instance.new("TextButton")
 local SneakyAnim_Button = Instance.new("TextButton")
 local ToyAnim_Button = Instance.new("TextButton")
 local KnightAnim_Button = Instance.new("TextButton")
+--[[local AdidasAnim_Button = Instance.new("TextButton")
+local NFLAnim_Button = Instance.new("TextButton")
+local BoldAnim_Button = Instance.new("TextButton")
+local NoBoundariesAnim_Button = Instance.new("TextButton")
+local Robot_Button = Instance.new("TextButton")--]]
 --NEWS
 local ConfidentAnim_Button = Instance.new("TextButton")
 local PopstarAnim_Button = Instance.new("TextButton")
@@ -2389,6 +2327,176 @@ TargetName_Input.FocusLost:Connect(function()
 	UpdateTarget(LabelTarget)
 end)
 
+--[[create_Button(adidasAnim, "[NEW] Adidas Animation Package", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local Animate = character:WaitForChild("Animate")
+
+    if not Animate then return end
+
+    Animate.Disabled = true
+    task.wait()
+    Animate.Disabled = false
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+
+    Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=18537376492"
+    Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=18537371272"
+    Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=18537392113"
+    Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=18537384940"
+    Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=18537380791"
+    Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=18537363391"
+    Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=18537367238"
+
+    task.wait()
+    if humanoid then
+        humanoid:ChangeState(3)
+    end
+    task.wait()
+    Animate.Disabled = false
+end)
+
+create_Button(NFLAnim, "[NEW] NFL Animation Package", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local Animate = character:WaitForChild("Animate")
+
+    if not Animate then return end
+
+    Animate.Disabled = true
+    task.wait()
+    Animate.Disabled = false
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+
+    Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=92080889861410"
+    Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=74451233229259"
+    Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=110358958299415"
+    Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=117333533048078"
+    Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=119846112151352"
+    Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=134630013742019"
+    Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=129773241321032"
+
+    task.wait()
+    if humanoid then
+        humanoid:ChangeState(3)
+    end
+    task.wait()
+    Animate.Disabled = false
+end)
+
+create_Button(BoldAnim, "[NEW] Bold Animation Package", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local Animate = character:WaitForChild("Animate")
+
+    if not Animate then return end
+
+    Animate.Disabled = true
+    task.wait()
+    Animate.Disabled = false
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+
+    Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=16738333868"
+    Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=16738334710"
+    Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=16738340646"
+    Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=16738337225"
+    Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=16738336650"
+    Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=16738332169"
+    Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=16738333171"
+
+    task.wait()
+    if humanoid then
+        humanoid:ChangeState(3)
+    end
+    task.wait()
+    Animate.Disabled = false
+end)
+
+create_Button(noBoundariesAnim, "[NEW] No Boundaries Animation Package", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local Animate = character:WaitForChild("Animate")
+
+    if not Animate then return end
+
+    Animate.Disabled = true
+    task.wait()
+    Animate.Disabled = false
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+
+    Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=18747067405"
+    Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=18747063918"
+    Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=18747074203"
+    Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=18747070484"
+    Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=18747069148"
+    Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=18747060903"
+    Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=18747062535"
+
+    task.wait()
+    if humanoid then
+        humanoid:ChangeState(3)
+    end
+    task.wait()
+    Animate.Disabled = false
+end)
+
+create_Button(robotAnim, "Robot Animation Package", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local Animate = character:WaitForChild("Animate")
+
+    if not Animate then return end
+
+    Animate.Disabled = true
+    task.wait()
+    Animate.Disabled = false
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+
+    Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=10921248039"
+    Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=10921248831"
+    Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=10921255446"
+    Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=10921250460"
+    Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=10921252123"
+    Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=10921247141"
+    Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=10921251156"
+
+    task.wait()
+    if humanoid then
+        humanoid:ChangeState(3)
+    end
+    task.wait()
+    Animate.Disabled = false
+end)--]]
+
 --ANIMATIONS
 
 VampireAnim_Button.MouseButton1Click:Connect(function()
@@ -2827,7 +2935,7 @@ end)
 FreeEmotes_Button.MouseButton1Click:Connect(function()
 	if not FreeEmotesEnabled then
 		FreeEmotesEnabled = true
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/AllEmotes"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai"))()
 	end
 end)
 
@@ -2924,3 +3032,96 @@ task.spawn(function()
 end)
 wait(.3)
 SendNotify("Hello, ",game.Players.LocalPlayer.Name)
+
+
+---------------
+--[[    local ChatBypassTextInput = Tab4:CreateInput({
+    Name = "Chat Bypass Input [UNSAFE FOR NOW!]",
+    PlaceholderText = "Text",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(saveInputFilter)
+        local TextChatService = game:GetService("TextChatService")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local chat = TextChatService.ChatInputBarConfiguration.TargetTextChannel
+
+        local letters = {
+            set1 = {
+                ["a"] = "ẳ",
+                ["b"] = "ɓ",
+                ["c"] = "ㄈ",
+                ["d"] = "ȡ",
+                ["e"] = "ȇ",
+                ["f"] = "ӻ",
+                ["g"] = "ɠ",
+                ["h"] = "ȟ",
+                ["i"] = "׀",
+                ["j"] = "ǰ",
+                ["k"] = "ҟ",
+                ["l"] = "ȴ",
+                ["m"] = "ɱ",
+                ["n"] = "冂",
+                ["o"] = "ό",
+                ["p"] = "ᵽ",
+                ["q"] = "ԛ",
+                ["r"] = "ŗ",
+                ["s"] = "ȿ",
+                ["t"] = "丅",
+                ["u"] = "ȕ",
+                ["v"] = "ѵ",
+                ["w"] = "ώ",
+                ["x"] = "ẍ",
+                ["y"] = "ƴ",
+                ["z"] = "ȥ",
+            }
+        }
+
+        local numbers = {
+            set1 = {
+                ["0"] = "Θ",
+                ["1"] = "Ɩ",
+                ["2"] = "ƻ",
+                ["3"] = "Ʒ",
+                ["4"] = "🄅",
+                ["5"] = "Ƽ",
+                ["6"] = "Ϭ",
+                ["7"] = "🄈",
+                ["8"] = "Ȣ",
+                ["9"] = "Θ",
+            }
+        }
+
+        local function convert(text)
+            local letters_set = letters["set1"]
+            local numbers_set = numbers["set1"]
+        
+            local converted = ""
+            for i = 1, #text do
+                local char = text:sub(i, i)
+                local lower_char = char:lower()
+        
+                if char:match("%a") then
+                    if lettersBypass then
+                        converted = converted .. char
+                    else
+                        converted = converted .. (letters_set[lower_char] or char)
+                    end
+                elseif char:match("%d") then
+                    if numbersBypass then
+                        converted = converted .. char
+                    else
+                        converted = converted .. (numbers_set[char] or char)
+                    end
+                else
+                    converted = converted .. char
+                end
+            end
+            return converted
+        end
+        wait(.2)
+        local function sendchat(msg)
+            chat:SendAsync(convert(msg))
+        end
+
+        sendchat(saveInputFilter)
+    end,})--]]
