@@ -2934,10 +2934,11 @@ end)
 
 FreeEmotes_Button.MouseButton1Click:Connect(function()
 	if not FreeEmotesEnabled then
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes Loaded",Text = "Press , or use the button on the left side.",Duration = 5;})
+		task.wait()
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen btw.]",Duration = 5;})
 		FreeEmotesEnabled = true
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai"))()
-		task.wait(0.1)
-        SendNotify("Free Emotes Loaded, Press 'comma' | AKA | ,")
 	end
 end)
 
