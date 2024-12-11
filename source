@@ -273,7 +273,7 @@ local AntiChatSpy_Button = Instance.new("TextButton")
 local AntiAFK_Button = Instance.new("TextButton")
 local Shaders_Button = Instance.new("TextButton")
 local Day_Button = Instance.new("TextButton")
-local Night_Button = Instance.new("TextButton")
+local DestroyUI_Button = Instance.new("TextButton")
 local Rejoin_Button = Instance.new("TextButton")
 local CMDX_Button = Instance.new("TextButton")
 local InfYield_Button = Instance.new("TextButton")
@@ -1270,20 +1270,20 @@ Day_Button.TextScaled = true
 Day_Button.TextSize = 14.000
 Day_Button.TextWrapped = true
 
-Night_Button.Name = "Night_Button"
-Night_Button.Parent = Misc_Section
-Night_Button.BackgroundColor3 = Color3.fromRGB(194, 0, 0)
-Night_Button.BackgroundTransparency = 0.500
-Night_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Night_Button.BorderSizePixel = 0
-Night_Button.Position = UDim2.new(0, 210, 0, 125)
-Night_Button.Size = UDim2.new(0, 150, 0, 30)
-Night_Button.Font = Enum.Font.Oswald
-Night_Button.Text = "Night"
-Night_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-Night_Button.TextScaled = true
-Night_Button.TextSize = 14.000
-Night_Button.TextWrapped = true
+DestroyUI_Button.Name = "DestroyUI_Button"
+DestroyUI_Button.Parent = Misc_Section
+DestroyUI_Button.BackgroundColor3 = Color3.fromRGB(194, 0, 0)
+DestroyUI_Button.BackgroundTransparency = 0.500
+DestroyUI_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+DestroyUI_Button.BorderSizePixel = 0
+DestroyUI_Button.Position = UDim2.new(0, 210, 0, 125)
+DestroyUI_Button.Size = UDim2.new(0, 150, 0, 30)
+DestroyUI_Button.Font = Enum.Font.Oswald
+DestroyUI_Button.Text = "Destroy GUI"
+DestroyUI_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+DestroyUI_Button.TextScaled = true
+DestroyUI_Button.TextSize = 14.000
+DestroyUI_Button.TextWrapped = true
 
 Explode_Button.Name = "Explode_Button"
 Explode_Button.Parent = Misc_Section
@@ -1632,7 +1632,7 @@ CreateToggle(AntiChatSpy_Button)
 CreateToggle(AntiAFK_Button)
 CreateToggle(Shaders_Button)
 CreateClicker(Day_Button)
-CreateClicker(Night_Button)
+CreateClicker(DestroyUI_Button)
 CreateClicker(Rejoin_Button)
 CreateClicker(CMDX_Button)
 CreateClicker(Explode_Button)
@@ -2788,11 +2788,16 @@ Day_Button.MouseButton1Click:Connect(function()
 	end
 end)
 
-Night_Button.MouseButton1Click:Connect(function()
-	if Shaders_Button.Ticket_Asset.ImageColor3 == Color3.fromRGB(255,0,0) then
-		game:GetService("Lighting").ClockTime = 19
+DestroyUI_Button.MouseButton1Click:Connect(function()
+	local CoreGui
+	if cloneref then
+		CoreGui = cloneref(game:GetService("CoreGui"))
 	else
-		SendNotify("System Broken","Please turn off shaders.",5)
+		CoreGui = game:GetService("CoreGui")
+	end
+	task.wait(0.1)
+	if CoreGui:FindFirstChild("SysBroker") then
+		CoreGui:Destroy()
 	end
 end)
 
