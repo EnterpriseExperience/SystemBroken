@@ -1511,7 +1511,7 @@ Crown_2.ImageColor3 = Color3.fromRGB(56, 56, 56)
 
 Assets.Name = "Assets"
 Assets.Parent = SysBroker
-
+wait(0.2)
 Ticket_Asset.Name = "Ticket_Asset"
 Ticket_Asset.Parent = Assets
 Ticket_Asset.AnchorPoint = Vector2.new(0, 0.5)
