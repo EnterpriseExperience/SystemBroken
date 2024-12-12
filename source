@@ -2849,6 +2849,7 @@ end)
 
 DestroyUI_Button.MouseButton1Click:Connect(function()
 	SysBroker:Destroy()
+	getgenv().GUI_Loaded = false
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
