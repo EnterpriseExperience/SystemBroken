@@ -2965,7 +2965,6 @@ task.spawn(function()
 	end
 end)
 wait(.3)
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes Loaded",Text = "Press , or use the button on the left side.",Duration = 5;})
 SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
 wait(.5)
 SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
