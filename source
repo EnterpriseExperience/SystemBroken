@@ -165,6 +165,37 @@ local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title,Text = message,Duration = duration;})
 end
 
+httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+
+local whitelistedURLs = {
+    "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+    "https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/source",
+    "https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/announce",
+    "https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/AntiFling",
+    "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",
+    "https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai",
+    "https://discord.gg/VJh3kkYzBn",
+}
+wait(0.2)
+local function isURLWhitelisted(url)
+    for _, allowedURL in ipairs(whitelistedURLs) do
+        if url == allowedURL then
+            return true
+        end
+    end
+    return false
+end
+
+local originalLoadstring = loadstring
+function loadstring(url)
+    if isURLWhitelisted(url) then
+        local response = game:HttpGet(url)
+        return originalLoadstring(response)()
+    else
+        return warn("Unauthorized loadstring URL: "..url)
+    end
+end
+
 --LOAD GUI
 task.wait(0.1)
 local SysBroker = Instance.new("ScreenGui")
