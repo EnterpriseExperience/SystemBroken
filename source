@@ -22,6 +22,21 @@ local SavedCheckpoint = nil
 local FreeEmotesEnabled = false
 local CannonsFolders = {}
 
+local function getExecutor()
+    local name
+    if identifyexecutor then
+        name = identifyexecutor()
+    end
+    return { Name = name or "Unknown Executor"}
+end
+
+local function detectExecutor()
+    local executorDetails = getExecutor()
+    return string.format("%s", executorDetails.Name)
+end
+wait(0.1)
+local executor_Name = detectExecutor()
+
 --FUNCTIONS
 _G.shield = function(id)
 	if not table.find(ForceWhitelist,id) then
@@ -165,7 +180,7 @@ local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title,Text = message,Duration = duration;})
 end
 
-httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+--[[httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 local whitelistedURLs = {
     "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
@@ -194,7 +209,7 @@ function loadstring(url)
     else
         return warn("Unauthorized loadstring URL: "..url)
     end
-end
+end--]]
 
 --LOAD GUI
 task.wait(0.1)
@@ -568,7 +583,7 @@ Announce_Label.BorderSizePixel = 0
 Announce_Label.Position = UDim2.new(0, 25, 0, 150)
 Announce_Label.Size = UDim2.new(0, 350, 0, 150)
 Announce_Label.Font = Enum.Font.SourceSans
-Announce_Label.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/announce"))()
+Announce_Label.Text = "I have modified this code, if there is something wrong, join: \nhttps://discord.gg/VJh3kkYzBn\nAnd check if there are any bugs/errors/updates."
 Announce_Label.TextColor3 = Color3.fromRGB(56, 56, 56)
 Announce_Label.TextSize = 24.000
 Announce_Label.TextWrapped = true
@@ -2884,11 +2899,41 @@ DestroyUI_Button.MouseButton1Click:Connect(function()
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    if executor_Name == "Solara" then
+        httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+
+        local response = httprequest({
+            Url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+            Method = "GET"
+        })
+
+        if response and response.StatusCode == 200 then
+            bruh_inf = loadstring(response.Body)()
+        else
+            print("Failed to fetch script:", response.StatusCode)
+        end
+    elseif executor_Name ~= "Solara" then
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
 end)
 
 CMDX_Button.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",true))()
+    if executor_Name == "Solara" then
+        httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+
+        local response = httprequest({
+            Url = "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",
+            Method = "GET"
+        })
+
+        if response and response.StatusCode == 200 then
+            cmd_x_main = loadstring(response.Body)()
+        else
+            print("Failed to fetch script:", response.StatusCode)
+        end
+    elseif executor_Name ~= "Solara" then
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source'))()
+    end
 end)
 
 Explode_Button.MouseButton1Click:Connect(function()
@@ -2908,7 +2953,49 @@ FreeEmotes_Button.MouseButton1Click:Connect(function()
 		task.wait()
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen btw.]",Duration = 5;})
 		FreeEmotesEnabled = true
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai"))()
+        if executor_Name == "Solara" then
+            local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+
+            if not httprequest then
+                error("HTTPRequest function not found. Ensure your executor supports HTTP requests.")
+            end
+
+            local response = httprequest({
+                Url = "https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai",
+                Method = "GET"
+            })
+
+            if response and response.StatusCode == 200 then
+                local scriptBody = response.Body
+                if scriptBody then
+                    print("Fetched script successfully.")
+                    
+                    local function customLoadString(scriptText)
+                        local env = setmetatable({}, { __index = getfenv and getfenv() or _G })
+                        
+                        local scriptFunction, compileError = loadstring(scriptText, "CustomScript", "t", env)
+                        if not scriptFunction then
+                            warn("Error compiling script: "..(compileError or "Unknown error"))
+                        end
+
+                        return scriptFunction()
+                    end
+
+                    local success, result = pcall(customLoadString, scriptBody)
+                    if success then
+                        print("Script executed successfully.")
+                    else
+                        print("Error executing script:", result)
+                    end
+                else
+                    error("Fetched script body is empty.")
+                end
+            else
+                print("Failed to fetch script. StatusCode:", response and response.StatusCode or "N/A")
+            end
+        elseif executor_Name ~= "Solara" then
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai'))()
+        end
 	end
 end)
 
