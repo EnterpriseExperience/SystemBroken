@@ -44,6 +44,35 @@ _G.shield = function(id)
 	end
 end
 
+if getgenv().anti_suspend then
+   warn("Already loaded anti-suspend.")
+else
+   local vc_inter = game:GetService("VoiceChatInternal")
+   local vc_service = game:GetService("VoiceChatService")
+
+   local reconnecting = false
+   local retryCooldown = 3
+   local function onVoiceChatStateChanged(oldState, newState)
+      if newState == Enum.VoiceChatState.Ended and not reconnecting then
+         reconnecting = true
+         task.spawn(function()
+            wait(retryCooldown)
+            local success, err = pcall(function()
+               vc_service:joinVoice()
+            end)
+            if not success then
+               warn("Error while rejoining voice chat:", err)
+            end
+            reconnecting = false
+         end)
+      end
+   end
+   wait()
+   getgenv().anti_suspend = true
+
+   vc_inter.StateChanged:Connect(onVoiceChatStateChanged)
+end
+
 local function RandomChar()
 	local length = math.random(1,5)
 	local array = {}
