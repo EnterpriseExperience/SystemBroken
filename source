@@ -1517,7 +1517,7 @@ FaceFk_Button.BorderSizePixel = 0
 FaceFk_Button.Position = UDim2.new(0, 25, 0, 25)
 FaceFk_Button.Size = UDim2.new(0, 150, 0, 30)
 FaceFk_Button.Font = Enum.Font.Oswald
-FaceFk_Button.Text = "Face F**k"
+FaceFk_Button.Text = "Face F**k (Z)"
 FaceFk_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
 FaceFk_Button.TextScaled = true
 FaceFk_Button.TextSize = 14.000
@@ -1630,8 +1630,9 @@ Credits_Label.Name = "Credits_Label"
 Credits_Label.Parent = Credits_Section
 Credits_Label.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Credits_Label.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Credits_Label.BackgroundTransparency = 1
 Credits_Label.BorderSizePixel = 0
-Credits_Label.Position = UDim2.new(0, 25, 0, 150)
+Credits_Label.Position = UDim2.new(0, 25, 0, 100)
 Credits_Label.Size = UDim2.new(0, 350, 0, 150)
 Credits_Label.Font = Enum.Font.SourceSans
 Credits_Label.Text = "Main: https://discord.gg/RkhpySwNR9\n[System Broken]\nRevamp: https://discord.gg/VJh3kkYzBn\n[Zacks Easy Hub]"
@@ -2368,7 +2369,7 @@ AnimPlayTarget_Button.MouseButton1Click:Connect(function()
 		return warn("Failed", "Player was not found!")
 	end
 
-	local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 0.5)
+	local Humanoid = Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 0.5)
 	local TheirCharacter = thePlayer.Character or thePlayer.CharacterAdded:Wait(0.5)
 	local GetTheirHumanoid = TheirCharacter and TheirCharacter:FindFirstChildWhichIsA("Humanoid") or TheirCharacter:WaitForChild("Humanoid", 0.5)
 	
@@ -3039,9 +3040,11 @@ ClearChatLogs_Button.MouseButton1Click:Connect(function()
 		chat:SendAsync(msg)
 	end
 	
-	for i = 1, 9 do
+	for i = 1, 5 do
 		sendchat("")
 	end
+	wait(0.5)
+	sendchat("/cls")
 end)
 
 ResetLighting_Button.MouseButton1Click:Connect(function()
