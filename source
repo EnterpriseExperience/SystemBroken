@@ -6,71 +6,43 @@ end
 local version = 2
 --VARIABLES
 _G.AntiFlingToggled = false
-local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local Light = game:GetService("Lighting")
-local HttpService = game:GetService("HttpService")
+local Players = cloneref and cloneref(game:GetService("Players")) or game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local plr = LocalPlayer or Players.LocalPlayer
+local speaker = LocalPlayer or Players.LocalPlayer
+local localplayer = LocalPlayer or Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local character = Character or LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 1)
+local human = Humanoid
+local Human = Humanoid
+local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart") or Character:WaitForChild("HumanoidRootPart", 1)
+local hrp = HumanoidRootPart
+local humanoidRootPart = HumanoidRootPart
+local Workspace = cloneref and cloneref(game:GetService("Workspace")) or game:GetService("Workspace")
+local TweenService = cloneref and cloneref(game:GetService("TweenService")) or game:GetService("TweenService")
+local RunService = cloneref and cloneref(game:GetService("RunService")) or game:GetService("RunService")
+local Light = cloneref and cloneref(game:GetService("Lighting")) or game:GetService("Lighting")
+local HttpService = cloneref and cloneref(game:GetService("HttpService")) or game:GetService("HttpService")
+local UserInputService = cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
 local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 local mouse = plr:GetMouse()
+local IYMouse = mouse or LocalPlayer:GetMouse()
+local Mouse = mouse or IYMouse or LocalPlayer:GetMouse()
 local ScriptWhitelist = {}
+getgenv().ScriptWhitelist = ScriptWhitelist or {}
 local ForceWhitelist = {}
+getgenv().ForceWhitelist = ForceWhitelist or {}
 local TargetedPlayer = nil
-local FlySpeed = 50
+local FlySpeed = 70
 local SavedCheckpoint = nil
 local FreeEmotesEnabled = false
-local CannonsFolders = {}
-
-local function getExecutor()
-    local name
-    if identifyexecutor then
-        name = identifyexecutor()
-    end
-    return { Name = name or "Unknown Executor"}
-end
-
-local function detectExecutor()
-    local executorDetails = getExecutor()
-    return string.format("%s", executorDetails.Name)
-end
-wait(0.1)
-local executor_Name = detectExecutor()
 
 --FUNCTIONS
 _G.shield = function(id)
 	if not table.find(ForceWhitelist,id) then
 		table.insert(ForceWhitelist, id)
 	end
-end
-
-if getgenv().anti_suspend then
-   warn("Already loaded anti-suspend.")
-else
-   local vc_inter = game:GetService("VoiceChatInternal")
-   local vc_service = game:GetService("VoiceChatService")
-
-   local reconnecting = false
-   local retryCooldown = 3
-   local function onVoiceChatStateChanged(oldState, newState)
-      if newState == Enum.VoiceChatState.Ended and not reconnecting then
-         reconnecting = true
-         task.spawn(function()
-            wait(retryCooldown)
-            local success, err = pcall(function()
-               vc_service:joinVoice()
-            end)
-            if not success then
-               warn("Error while rejoining voice chat:", err)
-            end
-            reconnecting = false
-         end)
-      end
-   end
-   wait()
-   getgenv().anti_suspend = true
-
-   vc_inter.StateChanged:Connect(onVoiceChatStateChanged)
 end
 
 local function RandomChar()
@@ -199,46 +171,17 @@ end
 
 local function StopAnim()
 	plr.Character.Animate.Disabled = false
-    local animtrack = plr.Character.Humanoid:GetPlayingAnimationTracks()
-    for i, track in pairs (animtrack) do
-        track:Stop()
-    end
+	local animtrack = plr.Character.Humanoid:GetPlayingAnimationTracks()
+	for i, track in pairs (animtrack) do
+		track:Stop()
+	end
 end
 
 local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title,Text = message,Duration = duration;})
 end
 
---[[httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-
-local whitelistedURLs = {
-    "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
-    "https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/source",
-    "https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/announce",
-    "https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/AntiFling",
-    "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",
-    "https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai",
-    "https://discord.gg/VJh3kkYzBn",
-}
-wait(0.2)
-local function isURLWhitelisted(url)
-    for _, allowedURL in ipairs(whitelistedURLs) do
-        if url == allowedURL then
-            return true
-        end
-    end
-    return false
-end
-
-local originalLoadstring = loadstring
-function loadstring(url)
-    if isURLWhitelisted(url) then
-        local response = game:HttpGet(url)
-        return originalLoadstring(response)()
-    else
-        return warn("Unauthorized loadstring URL: "..url)
-    end
-end--]]
+httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 --LOAD GUI
 task.wait(0.1)
@@ -248,31 +191,19 @@ local TitleBarLabel = Instance.new("TextLabel")
 local SectionList = Instance.new("Frame")
 local Home_Section_Button = Instance.new("TextButton")
 local Character_Section_Button = Instance.new("TextButton")
+local Universal_Section_Button = Instance.new("TextButton")
 local Target_Section_Button = Instance.new("TextButton")
 local Animations_Section_Button = Instance.new("TextButton")
+local Credits_Section_Button = Instance.new("TextButton")
 local Misc_Section_Button = Instance.new("TextButton")
-local AntiRagdoll_Button = Instance.new("TextButton")
-local SpamMines_Button = Instance.new("TextButton")
-local BreakCannons_Button = Instance.new("TextButton")
-local LethalCannons_Button = Instance.new("TextButton")
 local ChatAlert_Button = Instance.new("TextButton")
-local TouchFling_Button = Instance.new("TextButton")
 local CMDBar = Instance.new("TextBox")
-local CannonTP1_Button = Instance.new("TextButton")
-local CannonTP2_Button = Instance.new("TextButton")
-local CannonTP3_Button = Instance.new("TextButton")
-local MinefieldTP_Button = Instance.new("TextButton")
-local BallonTP_Button = Instance.new("TextButton")
-local NormalStairsTP_Button = Instance.new("TextButton")
-local MovingStairsTP_Button = Instance.new("TextButton")
-local SpiralStairsTP_Button = Instance.new("TextButton")
-local SkyscraperTP_Button = Instance.new("TextButton")
-local PoolTP_Button = Instance.new("TextButton")
 local Home_Section = Instance.new("ScrollingFrame")
 local Profile_Image = Instance.new("ImageLabel")
 local Welcome_Label = Instance.new("TextLabel")
 local Announce_Label = Instance.new("TextLabel")
 local Character_Section = Instance.new("ScrollingFrame")
+local Universal_Section = Instance.new("ScrollingFrame")
 local WalkSpeed_Button = Instance.new("TextButton")
 local WalkSpeed_Input = Instance.new("TextBox")
 local ClearCheckpoint_Button = Instance.new("TextButton")
@@ -281,6 +212,10 @@ local JumpPower_Button = Instance.new("TextButton")
 local SaveCheckpoint_Button = Instance.new("TextButton")
 local Respawn_Button = Instance.new("TextButton")
 local FlySpeed_Button = Instance.new("TextButton")
+local FaceFk_Button = Instance.new("TextButton")
+local ClearChatLogs_Button = Instance.new("TextButton")
+local rejoinVoice_Button = Instance.new("TextButton")
+local ResetLighting_Button = Instance.new("TextButton")
 local FlySpeed_Input = Instance.new("TextBox")
 local Fly_Button = Instance.new("TextButton")
 local Target_Section = Instance.new("ScrollingFrame")
@@ -293,6 +228,8 @@ local FocusTarget_Button = Instance.new("TextButton")
 local BenxTarget_Button = Instance.new("TextButton")
 local WhitelistTarget_Button = Instance.new("TextButton")
 local TeleportTarget_Button = Instance.new("TextButton")
+local AnimPlayTarget_Button = Instance.new("TextButton")
+local StopAnimsTarget_Button = Instance.new("TextButton")
 local HeadsitTarget_Button = Instance.new("TextButton")
 local StandTarget_Button = Instance.new("TextButton")
 local BackpackTarget_Button = Instance.new("TextButton")
@@ -314,8 +251,8 @@ local PirateAnim_Button = Instance.new("TextButton")
 local SneakyAnim_Button = Instance.new("TextButton")
 local ToyAnim_Button = Instance.new("TextButton")
 local KnightAnim_Button = Instance.new("TextButton")
---[[local AdidasAnim_Button = Instance.new("TextButton")
-local NFLAnim_Button = Instance.new("TextButton")
+local RobotAnim_Button = Instance.new("TextButton")
+--[local NFLAnim_Button = Instance.new("TextButton")
 local BoldAnim_Button = Instance.new("TextButton")
 local NoBoundariesAnim_Button = Instance.new("TextButton")
 local Robot_Button = Instance.new("TextButton")--]]
@@ -410,12 +347,10 @@ Background.SliceCenter = Rect.new(0, 256, 0, 256)
 Background.TileSize = UDim2.new(0, 30, 0, 30)
 Background.Active = true
 wait(0.2)
-if Background.Draggable then
+if Background.Draggable or Background.Draggable == true then
 	Background.Draggable = false
-else
-	warn("Nope!")
 end
-
+wait(0.1)
 local UIS = game:GetService("UserInputService")
 
 local guiObject = Background
@@ -476,8 +411,8 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-TitleBarLabel.Text = "     Easiest Solutions, Inc | Trademark."
-TitleBarLabel.TextColor3 = Color3.fromRGB(56, 56, 56)
+TitleBarLabel.Text = "			Zacks Modified Broken"
+TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
 TitleBarLabel.TextWrapped = true
@@ -522,6 +457,21 @@ Character_Section_Button.TextScaled = true
 Character_Section_Button.TextSize = 14.000
 Character_Section_Button.TextWrapped = true
 
+Universal_Section_Button.Name = "Universal_Section_Button"
+Universal_Section_Button.Parent = SectionList
+Universal_Section_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+Universal_Section_Button.BackgroundTransparency = 0.500
+Universal_Section_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Universal_Section_Button.BorderSizePixel = 0
+Universal_Section_Button.Position = UDim2.new(0, 0, 0, 65)
+Universal_Section_Button.Size = UDim2.new(0, 105, 0, 30)
+Universal_Section_Button.Font = Enum.Font.Oswald
+Universal_Section_Button.Text = "Universal"
+Universal_Section_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+Universal_Section_Button.TextScaled = true
+Universal_Section_Button.TextSize = 14.000
+Universal_Section_Button.TextWrapped = true
+
 Target_Section_Button.Name = "Target_Section_Button"
 Target_Section_Button.Parent = SectionList
 Target_Section_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
@@ -551,6 +501,21 @@ Animations_Section_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
 Animations_Section_Button.TextScaled = true
 Animations_Section_Button.TextSize = 14.000
 Animations_Section_Button.TextWrapped = true
+
+Credits_Section_Button.Name = "Credits_Section_Button"
+Credits_Section_Button.Parent = SectionList
+Credits_Section_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+Credits_Section_Button.BackgroundTransparency = 0.500
+Credits_Section_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Credits_Section_Button.BorderSizePixel = 0
+Credits_Section_Button.Position = UDim2.new(0, 0, 0, 265)
+Credits_Section_Button.Size = UDim2.new(0, 105, 0, 30)
+Credits_Section_Button.Font = Enum.Font.Oswald
+Credits_Section_Button.Text = "Credits"
+Credits_Section_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+Credits_Section_Button.TextScaled = true
+Credits_Section_Button.TextSize = 14.000
+Credits_Section_Button.TextWrapped = true
 
 Misc_Section_Button.Name = "Misc_Section_Button"
 Misc_Section_Button.Parent = SectionList
@@ -612,7 +577,7 @@ Announce_Label.BorderSizePixel = 0
 Announce_Label.Position = UDim2.new(0, 25, 0, 150)
 Announce_Label.Size = UDim2.new(0, 350, 0, 150)
 Announce_Label.Font = Enum.Font.SourceSans
-Announce_Label.Text = "I have modified this code, if there is something wrong, join: \nhttps://discord.gg/VJh3kkYzBn\nAnd check if there are any bugs/errors/updates."
+Announce_Label.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/SystemBroken/refs/heads/main/announce"))()
 Announce_Label.TextColor3 = Color3.fromRGB(56, 56, 56)
 Announce_Label.TextSize = 24.000
 Announce_Label.TextWrapped = true
@@ -631,6 +596,19 @@ Character_Section.Size = UDim2.new(0, 395, 0, 320)
 Character_Section.Visible = false
 Character_Section.CanvasSize = UDim2.new(0, 0, 1, 0)
 Character_Section.ScrollBarThickness = 5
+
+Universal_Section.Name = "Universal_Section"
+Universal_Section.Parent = Background
+Universal_Section.Active = true
+Universal_Section.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Universal_Section.BackgroundTransparency = 1.000
+Universal_Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Universal_Section.BorderSizePixel = 0
+Universal_Section.Position = UDim2.new(0, 105, 0, 30)
+Universal_Section.Size = UDim2.new(0, 395, 0, 320)
+Universal_Section.Visible = false
+Universal_Section.CanvasSize = UDim2.new(0, 0, 1, 0)
+Universal_Section.ScrollBarThickness = 5
 
 WalkSpeed_Button.Name = "WalkSpeed_Button"
 WalkSpeed_Button.Parent = Character_Section
@@ -919,6 +897,36 @@ TeleportTarget_Button.TextScaled = true
 TeleportTarget_Button.TextSize = 14.000
 TeleportTarget_Button.TextWrapped = true
 
+AnimPlayTarget_Button.Name = "AnimPlayTarget_Button"
+AnimPlayTarget_Button.Parent = Target_Section
+AnimPlayTarget_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+AnimPlayTarget_Button.BackgroundTransparency = 0.500
+AnimPlayTarget_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+AnimPlayTarget_Button.BorderSizePixel = 0
+AnimPlayTarget_Button.Position = UDim2.new(0, 25, 0, 150)
+AnimPlayTarget_Button.Size = UDim2.new(0, 150, 0, 30)
+AnimPlayTarget_Button.Font = Enum.Font.Oswald
+AnimPlayTarget_Button.Text = "Copy Animation"
+AnimPlayTarget_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+AnimPlayTarget_Button.TextScaled = true
+AnimPlayTarget_Button.TextSize = 14.000
+AnimPlayTarget_Button.TextWrapped = true
+
+StopAnimsTarget_Button.Name = "StopAnimsTarget_Button"
+StopAnimsTarget_Button.Parent = Target_Section
+StopAnimsTarget_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+StopAnimsTarget_Button.BackgroundTransparency = 0.500
+StopAnimsTarget_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+StopAnimsTarget_Button.BorderSizePixel = 0
+StopAnimsTarget_Button.Position = UDim2.new(0, 25, 0, 400)
+StopAnimsTarget_Button.Size = UDim2.new(0, 150, 0, 30)
+StopAnimsTarget_Button.Font = Enum.Font.Oswald
+StopAnimsTarget_Button.Text = "Stop Animation"
+StopAnimsTarget_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+StopAnimsTarget_Button.TextScaled = true
+StopAnimsTarget_Button.TextSize = 14.000
+StopAnimsTarget_Button.TextWrapped = true
+
 HeadsitTarget_Button.Name = "HeadsitTarget_Button"
 HeadsitTarget_Button.Parent = Target_Section
 HeadsitTarget_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
@@ -1051,6 +1059,21 @@ ZombieClassicAnim_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
 ZombieClassicAnim_Button.TextScaled = true
 ZombieClassicAnim_Button.TextSize = 14.000
 ZombieClassicAnim_Button.TextWrapped = true
+
+RobotAnim_Button.Name = "RobotAnim_Button"
+RobotAnim_Button.Parent = Animations_Section
+RobotAnim_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+RobotAnim_Button.BackgroundTransparency = 0.500
+RobotAnim_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RobotAnim_Button.BorderSizePixel = 0
+RobotAnim_Button.Position = UDim2.new(0, 210, 0, 525)
+RobotAnim_Button.Size = UDim2.new(0, 150, 0, 30)
+RobotAnim_Button.Font = Enum.Font.Oswald
+RobotAnim_Button.Text = "Robot"
+RobotAnim_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+RobotAnim_Button.TextScaled = true
+RobotAnim_Button.TextSize = 14.000
+RobotAnim_Button.TextWrapped = true
 
 MageAnim_Button.Name = "MageAnim_Button"
 MageAnim_Button.Parent = Animations_Section
@@ -1485,6 +1508,66 @@ InfYield_Button.TextScaled = true
 InfYield_Button.TextSize = 14.000
 InfYield_Button.TextWrapped = true
 
+FaceFk_Button.Name = "FaceFk_Button"
+FaceFk_Button.Parent = Universal_Section
+FaceFk_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+FaceFk_Button.BackgroundTransparency = 0.500
+FaceFk_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+FaceFk_Button.BorderSizePixel = 0
+FaceFk_Button.Position = UDim2.new(0, 25, 0, 25)
+FaceFk_Button.Size = UDim2.new(0, 150, 0, 30)
+FaceFk_Button.Font = Enum.Font.Oswald
+FaceFk_Button.Text = "Face F**k"
+FaceFk_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+FaceFk_Button.TextScaled = true
+FaceFk_Button.TextSize = 14.000
+FaceFk_Button.TextWrapped = true
+
+ClearChatLogs_Button.Name = "ClearChatLogs_Button"
+ClearChatLogs_Button.Parent = Universal_Section
+ClearChatLogs_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+ClearChatLogs_Button.BackgroundTransparency = 0.500
+ClearChatLogs_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ClearChatLogs_Button.BorderSizePixel = 0
+ClearChatLogs_Button.Position = UDim2.new(0, 210, 0, 25)
+ClearChatLogs_Button.Size = UDim2.new(0, 150, 0, 30)
+ClearChatLogs_Button.Font = Enum.Font.Oswald
+ClearChatLogs_Button.Text = "Clear Chat Messages"
+ClearChatLogs_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+ClearChatLogs_Button.TextScaled = true
+ClearChatLogs_Button.TextSize = 14.000
+ClearChatLogs_Button.TextWrapped = true
+
+rejoinVoice_Button.Name = "rejoinVoice_Button"
+rejoinVoice_Button.Parent = Universal_Section
+rejoinVoice_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+rejoinVoice_Button.BackgroundTransparency = 0.500
+rejoinVoice_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+rejoinVoice_Button.BorderSizePixel = 0
+rejoinVoice_Button.Position = UDim2.new(0, 25, 0, 75)
+rejoinVoice_Button.Size = UDim2.new(0, 150, 0, 30)
+rejoinVoice_Button.Font = Enum.Font.Oswald
+rejoinVoice_Button.Text = "Rejoin Voice"
+rejoinVoice_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+rejoinVoice_Button.TextScaled = true
+rejoinVoice_Button.TextSize = 14.000
+rejoinVoice_Button.TextWrapped = true
+
+ResetLighting_Button.Name = "ResetLighting_Button"
+ResetLighting_Button.Parent = Universal_Section
+ResetLighting_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+ResetLighting_Button.BackgroundTransparency = 0.500
+ResetLighting_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ResetLighting_Button.BorderSizePixel = 0
+ResetLighting_Button.Position = UDim2.new(0, 210, 0, 75)
+ResetLighting_Button.Size = UDim2.new(0, 150, 0, 30)
+ResetLighting_Button.Font = Enum.Font.Oswald
+ResetLighting_Button.Text = "Reset Lighting"
+ResetLighting_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+ResetLighting_Button.TextScaled = true
+ResetLighting_Button.TextSize = 14.000
+ResetLighting_Button.TextWrapped = true
+
 FreeEmotes_Button.Name = "FreeEmotes_Button"
 FreeEmotes_Button.Parent = Misc_Section
 FreeEmotes_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
@@ -1551,7 +1634,7 @@ Credits_Label.BorderSizePixel = 0
 Credits_Label.Position = UDim2.new(0, 25, 0, 150)
 Credits_Label.Size = UDim2.new(0, 350, 0, 150)
 Credits_Label.Font = Enum.Font.SourceSans
-Credits_Label.Text = "Version: "..version
+Credits_Label.Text = "Main: https://discord.gg/RkhpySwNR9\n[System Broken]\nRevamp: https://discord.gg/VJh3kkYzBn\n[Zacks Easy Hub]"
 Credits_Label.TextColor3 = Color3.fromRGB(56, 56, 56)
 Credits_Label.TextSize = 24.000
 Credits_Label.TextWrapped = true
@@ -1569,7 +1652,7 @@ Crown.Position = UDim2.new(0, 483, 0, 13)
 Crown.Rotation = 0
 Crown.Size = UDim2.new(0, 75, 0, 75)
 Crown.Image = "rbxassetid://12298407748"
-Crown.ImageColor3 = Color3.fromRGB(56, 56, 56)
+Crown.ImageColor3 = Color3.fromRGB(255, 255, 255)
 
 Crown_2.Name = "Crown_2"
 Crown_2.Parent = Background
@@ -1582,7 +1665,7 @@ Crown_2.Position = UDim2.new(0, -14, 0, 13)
 Crown_2.Rotation = 0.000
 Crown_2.Size = UDim2.new(0, 75, 0, 75)
 Crown_2.Image = "rbxassetid://12298407748"
-Crown_2.ImageColor3 = Color3.fromRGB(56, 56, 56)
+Crown_2.ImageColor3 = Color3.fromRGB(255, 255, 255)
 
 Assets.Name = "Assets"
 Assets.Parent = SysBroker
@@ -1704,22 +1787,7 @@ OpenClose.ImageColor3 = Color3.fromRGB(56, 56, 56)
 UICornerOC.CornerRadius = UDim.new(1, 0)
 UICornerOC.Parent = OpenClose
 
-CreateToggle(AntiRagdoll_Button)
-CreateToggle(SpamMines_Button)
-CreateToggle(TouchFling_Button)
-CreateClicker(BreakCannons_Button)
-CreateClicker(LethalCannons_Button)
 CreateClicker(ChatAlert_Button)
-CreateClicker(CannonTP1_Button)
-CreateClicker(CannonTP2_Button)
-CreateClicker(CannonTP3_Button)
-CreateClicker(MinefieldTP_Button)
-CreateClicker(BallonTP_Button)
-CreateClicker(NormalStairsTP_Button)
-CreateClicker(MovingStairsTP_Button)
-CreateClicker(SpiralStairsTP_Button)
-CreateClicker(SkyscraperTP_Button)
-CreateClicker(PoolTP_Button)
 
 CreateToggle(Fly_Button)
 CreateClicker(WalkSpeed_Button)
@@ -1728,6 +1796,10 @@ CreateClicker(JumpPower_Button)
 CreateClicker(SaveCheckpoint_Button)
 CreateClicker(Respawn_Button)
 CreateClicker(FlySpeed_Button)
+CreateClicker(FaceFk_Button)
+CreateClicker(rejoinVoice_Button)
+CreateClicker(ResetLighting_Button)
+CreateClicker(ClearChatLogs_Button)
 
 CreateToggle(ViewTarget_Button)
 CreateToggle(FocusTarget_Button)
@@ -1739,6 +1811,8 @@ CreateToggle(DoggyTarget_Button)
 CreateToggle(DragTarget_Button)
 CreateClicker(WhitelistTarget_Button)
 CreateClicker(TeleportTarget_Button)
+CreateClicker(AnimPlayTarget_Button)
+CreateClicker(StopAnimsTarget_Button)
 
 CreateClicker(VampireAnim_Button)
 CreateClicker(HeroAnim_Button)
@@ -1761,6 +1835,7 @@ CreateClicker(PrincessAnim_Button)
 CreateClicker(CowboyAnim_Button)
 CreateClicker(PatrolAnim_Button)
 CreateClicker(ZombieFEAnim_Button)
+CreateClicker(RobotAnim_Button)
 
 CreateToggle(AntiFling_Button)
 CreateToggle(AntiChatSpy_Button)
@@ -1824,29 +1899,14 @@ local function UpdateTarget(player)
 	end
 end
 
-local function ToggleFling(bool)
-	task.spawn(function()
-		if bool then
-			local RVelocity = nil
-			repeat
-				pcall(function()
-					RVelocity = GetRoot(plr).Velocity 
-					GetRoot(plr).Velocity = Vector3.new(math.random(-150,150),-25000,math.random(-150,150))
-					RunService.RenderStepped:wait()
-					GetRoot(plr).Velocity = RVelocity
-				end)
-				RunService.Heartbeat:wait()
-			until TouchFling_Button.Ticket_Asset.ImageColor3 == Color3.fromRGB(255,0,0)
-		else
-			TouchFling_Button.Ticket_Asset.ImageColor3 = Color3.fromRGB(255,0,0)
-		end
-	end)
-end
-
 --CHANGE SECTION BUTTONS
 ChangeSection(Home_Section_Button)
 Home_Section_Button.MouseButton1Click:Connect(function()
 	ChangeSection(Home_Section_Button)
+end)
+
+Universal_Section_Button.MouseButton1Click:Connect(function()
+	ChangeSection(Universal_Section_Button)
 end)
 
 Character_Section_Button.MouseButton1Click:Connect(function()
@@ -1865,52 +1925,16 @@ Misc_Section_Button.MouseButton1Click:Connect(function()
 	ChangeSection(Misc_Section_Button)
 end)
 
+Credits_Section_Button.MouseButton1Click:Connect(function()
+	ChangeSection(Credits_Section_Button)
+end)
+
 ChatAlert_Button.MouseButton1Click:Connect(function()
 	for i = 1,3 do
         local textchannel = game:GetService("TextChatService"):WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
         local message = "\u{205F}"
         textchannel:SendAsync(message)
 	end
-end)
-
-CannonTP1_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-61, 34, -228,"pos","safe")
-end)
-
-CannonTP2_Button.MouseButton1Click:Connect(function()
-	TeleportTO(50, 34, -228,"pos","safe")
-end)
-
-CannonTP3_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-6, 35, -106,"pos","safe")
-end)
-
-MinefieldTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-65, 23, -151,"pos","safe")
-end)
-
-BallonTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-118, 23, -126,"pos","safe")
-end)
-
-NormalStairsTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-6, 203, -496,"pos","safe")
-end)
-
-MovingStairsTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-210, 87, -224,"pos","safe")
-end)
-
-SpiralStairsTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(151, 847, -306,"pos","safe")
-end)
-
-SkyscraperTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(142, 1033, -192,"pos","safe")
-end)
-
-PoolTP_Button.MouseButton1Click:Connect(function()
-	TeleportTO(-133, 65, -321,"pos","safe")
 end)
 
 CMDBar.FocusLost:Connect(function()
@@ -2322,6 +2346,56 @@ TeleportTarget_Button.MouseButton1Click:Connect(function()
 	end
 end)
 
+StopAnimsTarget_Button.MouseButton1Click:Connect(function()
+	for _, animTrack in pairs(Humanoid:GetPlayingAnimationTracks()) do
+		animTrack:Stop()
+  	end
+end)
+
+AnimPlayTarget_Button.MouseButton1Click:Connect(function()
+	function getThatPlr()
+		for i, v in pairs(Players:GetChildren()) do
+			if TargetName_Input.Text == v.Name then
+				return v
+			end
+		end
+		return nil
+	end
+	
+	local thePlayer = getThatPlr()
+
+	if not thePlayer then
+		return warn("Failed", "Player was not found!")
+	end
+
+	local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 0.5)
+	local TheirCharacter = thePlayer.Character or thePlayer.CharacterAdded:Wait(0.5)
+	local GetTheirHumanoid = TheirCharacter and TheirCharacter:FindFirstChildWhichIsA("Humanoid") or TheirCharacter:WaitForChild("Humanoid", 0.5)
+	
+	for _, animTrack in pairs(Humanoid:GetPlayingAnimationTracks()) do
+		animTrack:Stop()
+	end
+
+	local theirHumanoid = TheirCharacter:FindFirstChildWhichIsA('Humanoid') or TheirCharacter:WaitForChild('Humanoid')
+	
+	for _, animTrack in pairs(Humanoid:GetPlayingAnimationTracks()) do
+		animTrack:Stop()
+	end
+
+	for _, v1 in pairs(theirHumanoid:GetPlayingAnimationTracks()) do
+		if not string.find(v1.Animation.AnimationId, "507768375") then
+			local ANIM = Humanoid:LoadAnimation(v1.Animation)
+			ANIM:Play(.1, 1, v1.Speed)
+			ANIM.TimePosition = v1.TimePosition
+			task.spawn(function()
+				v1.Stopped:Wait()
+				ANIM:Stop()
+				ANIM:Destroy()
+			end)
+		end
+	end
+end)
+
 WhitelistTarget_Button.MouseButton1Click:Connect(function()
 	if TargetedPlayer ~= nil then
 		if table.find(ScriptWhitelist, Players[TargetedPlayer].UserId) then
@@ -2543,6 +2617,35 @@ HeroAnim_Button.MouseButton1Click:Connect(function()
 	Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=616104706"
 	Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=616108001"
 	plr.Character.Humanoid:ChangeState(3)
+	Animate.Disabled = false
+end)
+
+RobotAnim_Button.MouseButton1Click:Connect(function()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local Animate = character and character:FindFirstChild("Animate") or character:WaitForChild("Animate")
+
+	if not Animate then return end
+
+	Animate.Disabled = true
+	task.wait()
+	Animate.Disabled = false
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+			track:Stop()
+		end
+	end
+
+	Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=10921248039"
+	Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=10921248831"
+	Animate.walk.WalkAnim.AnimationId = "http://www.roblox.com/asset/?id=10921255446"
+	Animate.run.RunAnim.AnimationId = "http://www.roblox.com/asset/?id=10921250460"
+	Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=10921252123"
+	Animate.climb.ClimbAnim.AnimationId = "http://www.roblox.com/asset/?id=10921247141"
+	Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=10921251156"
+	task.wait()
 	Animate.Disabled = false
 end)
 
@@ -2925,44 +3028,155 @@ end)
 DestroyUI_Button.MouseButton1Click:Connect(function()
 	SysBroker:Destroy()
 	getgenv().GUI_Loaded = false
+	getgenv().rainbow_script = false
+end)
+
+ClearChatLogs_Button.MouseButton1Click:Connect(function()
+	local TextChatService = cloneref and cloneref(game:GetService("TextChatService")) or game:GetService("TextChatService")
+	local chat = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
+
+	local function sendchat(msg)
+		chat:SendAsync(msg)
+	end
+	
+	for i = 1, 9 do
+		sendchat("")
+	end
+end)
+
+ResetLighting_Button.MouseButton1Click:Connect(function()
+	function resetLightingSettings()
+		local Lighting = cloneref and cloneref(game:GetService("Lighting")) or game:GetService("Lighting")
+		local SunRays = Lighting:FindFirstChildOfClass("SunRaysEffect")
+
+		Lighting.ClockTime = 14.5
+		wait()
+		Lighting.Brightness = 3
+		wait()
+		if not Lighting:FindFirstChildOfClass("Atmosphere") then
+			warn("Atmosphere not found, creating...")
+			wait(0.1)
+			local Atmosphere = Instance.new("Atmosphere")
+			Atmosphere.Name = "Atmosphere"
+			Atmosphere.Parent = Lighting
+			Atmosphere.Density = 0.3
+			Atmosphere.Offset = 0.25
+			Atmosphere.Color = Color3.fromRGB(199, 199, 199)
+			Atmosphere.Decay = Color3.fromRGB(106, 112, 125)
+			Atmosphere.Glare = 0
+			Atmosphere.Haze = 0
+		else
+			print("Atmosphere found, continuing...")
+			wait(0.1)
+			Lighting.Atmosphere.Density = 0.3
+			Lighting.Atmosphere.Offset = 0.25
+			Lighting.Atmosphere.Color = Color3.fromRGB(199, 199, 199)
+			Lighting.Atmosphere.Decay = Color3.fromRGB(106, 112, 125)
+			Lighting.Atmosphere.Glare = 0
+			Lighting.Atmosphere.Haze = 0
+		end
+		wait(0.1)
+		if not Lighting:FindFirstChildOfClass("Sky") then
+			warn("Sky not found, creating...")
+			wait(0.1)
+			local Sky = Instance.new("Sky")
+			Sky.Name = "Sky"
+			Sky.Parent = Lighting
+			Sky.MoonAngularSize = 11
+			Sky.StarCount = 3000
+			Sky.SunAngularSize = 11
+		else
+			print("Sky found, continuing...")
+			wait(0.1)
+			Lighting.Sky.MoonAngularSize = 11
+			Lighting.Sky.StarCount = 3000
+			Lighting.Sky.SunAngularSize = 11
+		end
+		wait(0.1)
+		if not Lighting:FindFirstChildOfClass("BloomEffect") then
+			warn("Bloom was not found, creating...")
+			wait(0.1)
+			local Bloom = Instance.new("BloomEffect")
+			Bloom.Name = "Bloom"
+			Bloom.Parent = Lighting
+			Bloom.Intensity = 1
+			Bloom.Enabled = true
+			Bloom.Size = 24
+			Bloom.Threshold = 2
+		else
+			print("Found Bloom, continuing...")
+			wait(0.1)
+			Lighting.Bloom.Intensity = 1
+			Lighting.Bloom.Enabled = true
+			Lighting.Bloom.Size = 24
+			Lighting.Bloom.Threshold = 2
+		end
+		wait(0.1)
+		if not Lighting:FindFirstChildOfClass("DepthOfFieldEffect") then
+			warn("DepthOfField not found, creating...")
+			wait(0.1)
+			local DepthOfField = Instance.new("DepthOfFieldEffect")
+			DepthOfField.Name = "DepthOfField"
+			DepthOfField.Parent = Lighting
+			DepthOfField.Enabled = false
+			DepthOfField.FarIntensity = 0.1
+			DepthOfField.FocusDistance = 0.05
+			DepthOfField.InFocusRadius = 30
+			DepthOfField.NearIntensity = 0.75
+		else
+			print("DepthOfField found, continuing...")
+			wait(0.1)
+			Lighting.DepthOfField.Enabled = false
+			Lighting.DepthOfField.FarIntensity = 0.1
+			Lighting.DepthOfField.FocusDistance = 0.05
+			Lighting.DepthOfField.InFocusRadius = 30
+			Lighting.DepthOfField.NearIntensity = 0.75
+		end
+		wait(0.1)
+		if not Lighting:FindFirstChildOfClass("SunRaysEffect") then
+			warn("SunRays was not found, creating...")
+			wait(0.1)
+			local SunRays = Instance.new("SunRaysEffect")
+			SunRays.Name = "SunRays"
+			SunRays.Parent = Lighting
+			SunRays.Enabled = true
+			SunRays.Intensity = 0.01
+			SunRays.Spread = 0.1
+		else
+			print("SunRays found, continuing...")
+			wait(0.1)
+			Lighting.SunRays.Enabled = true
+			Lighting.SunRays.Intensity = 0.01
+			Lighting.SunRays.Spread = 0.1
+		end
+  end
+
+  resetLightingSettings()
+end)
+
+rejoinVoice_Button.MouseButton1Click:Connect(function()
+	local VoiceChatService = cloneref and cloneref(game:GetService("VoiceChatService")) or game:GetService("VoiceChatService")
+	local VoiceChatInternal = cloneref and cloneref(game:GetService("VoiceChatInternal")) or game:GetService("VoiceChatInternal")
+
+	VoiceChatService:rejoinVoice()
+	VoiceChatService:joinVoice()
+end)
+
+FaceFk_Button.MouseButton1Click:Connect(function()
+	if getgenv().loaded_face_bang then
+		return warn("Notification:", "Already loaded face f*ck script!")
+	else
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/bruhlolw/refs/heads/main/face_bang_script.lua'))()
+		getgenv().loaded_face_bang = true
+	end
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
-    if executor_Name == "Solara" then
-        httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-
-        local response = httprequest({
-            Url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
-            Method = "GET"
-        })
-
-        if response and response.StatusCode == 200 then
-            bruh_inf = loadstring(response.Body)()
-        else
-            print("Failed to fetch script:", response.StatusCode)
-        end
-    elseif executor_Name ~= "Solara" then
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-    end
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 end)
 
 CMDX_Button.MouseButton1Click:Connect(function()
-    if executor_Name == "Solara" then
-        httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-
-        local response = httprequest({
-            Url = "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",
-            Method = "GET"
-        })
-
-        if response and response.StatusCode == 200 then
-            cmd_x_main = loadstring(response.Body)()
-        else
-            print("Failed to fetch script:", response.StatusCode)
-        end
-    elseif executor_Name ~= "Solara" then
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source'))()
-    end
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",true))()
 end)
 
 Explode_Button.MouseButton1Click:Connect(function()
@@ -2973,7 +3187,7 @@ Explode_Button.MouseButton1Click:Connect(function()
 	bav.MaxTorque = Vector3.new(0,math.huge,0)
 	bav.AngularVelocity = Vector3.new(0,150,0)
 	task.wait(3)
-	plr.Character.Humanoid:ChangeState(15)
+	plr.Character:WaitForChild("Humanoid"):ChangeState(15)
 end)
 
 FreeEmotes_Button.MouseButton1Click:Connect(function()
@@ -2982,49 +3196,7 @@ FreeEmotes_Button.MouseButton1Click:Connect(function()
 		task.wait()
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen btw.]",Duration = 5;})
 		FreeEmotesEnabled = true
-        if executor_Name == "Solara" then
-            local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-
-            if not httprequest then
-                error("HTTPRequest function not found. Ensure your executor supports HTTP requests.")
-            end
-
-            local response = httprequest({
-                Url = "https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai",
-                Method = "GET"
-            })
-
-            if response and response.StatusCode == 200 then
-                local scriptBody = response.Body
-                if scriptBody then
-                    print("Fetched script successfully.")
-                    
-                    local function customLoadString(scriptText)
-                        local env = setmetatable({}, { __index = getfenv and getfenv() or _G })
-                        
-                        local scriptFunction, compileError = loadstring(scriptText, "CustomScript", "t", env)
-                        if not scriptFunction then
-                            warn("Error compiling script: "..(compileError or "Unknown error"))
-                        end
-
-                        return scriptFunction()
-                    end
-
-                    local success, result = pcall(customLoadString, scriptBody)
-                    if success then
-                        print("Script executed successfully.")
-                    else
-                        print("Error executing script:", result)
-                    end
-                else
-                    error("Fetched script body is empty.")
-                end
-            else
-                print("Failed to fetch script. StatusCode:", response and response.StatusCode or "N/A")
-            end
-        elseif executor_Name ~= "Solara" then
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai'))()
-        end
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai"))()
 	end
 end)
 
@@ -3043,11 +3215,90 @@ CopyInvite_Button.MouseButton1Click:Connect(function()
 end)
 
 ChatBox_Input.FocusLost:Connect(function()
-    local textchannel = game:GetService("TextChatService"):WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
-    local message = ChatBox_Input.Text
-    textchannel:SendAsync(message)
-    wait()
-    ChatBox_Input.Text = ""
+	local TextChatService = cloneref and cloneref(game:GetService("TextChatService")) or game:GetService("TextChatService")
+	local chat = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
+
+	local letters = {
+		 set1 = {
+			  ["a"] = "ẳ",
+			  ["b"] = "ɓ",
+			  ["c"] = "ㄈ",
+			  ["d"] = "ȡ",
+			  ["e"] = "ȇ",
+			  ["f"] = "ӻ",
+			  ["g"] = "ɠ",
+			  ["h"] = "ȟ",
+			  ["i"] = "׀",
+			  ["j"] = "ǰ",
+			  ["k"] = "ҟ",
+			  ["l"] = "ȴ",
+			  ["m"] = "ɱ",
+			  ["n"] = "冂",
+			  ["o"] = "ό",
+			  ["p"] = "ᵽ",
+			  ["q"] = "ԛ",
+			  ["r"] = "ŗ",
+			  ["s"] = "ȿ",
+			  ["t"] = "丅",
+			  ["u"] = "ȕ",
+			  ["v"] = "ѵ",
+			  ["w"] = "ώ",
+			  ["x"] = "ẍ",
+			  ["y"] = "ƴ",
+			  ["z"] = "ȥ",
+		 }
+	}
+
+	local numbers = {
+		 set1 = {
+			  ["0"] = "Θ",
+			  ["1"] = "Ɩ",
+			  ["2"] = "ƻ",
+			  ["3"] = "Ʒ",
+			  ["4"] = "🄅",
+			  ["5"] = "Ƽ",
+			  ["6"] = "Ϭ",
+			  ["7"] = "🄈",
+			  ["8"] = "Ȣ",
+			  ["9"] = "Θ",
+		 }
+	}
+
+	local function convert(text)
+		 local letters_set = letters["set1"]
+		 local numbers_set = numbers["set1"]
+	
+		 local converted = ""
+		 for i = 1, #text do
+			  local char = text:sub(i, i)
+			  local lower_char = char:lower()
+	
+			  if char:match("%a") then
+					if lettersBypass then
+						 converted = converted .. char
+					else
+						 converted = converted .. (letters_set[lower_char] or char)
+					end
+			  elseif char:match("%d") then
+					if numbersBypass then
+						 converted = converted .. char
+					else
+						 converted = converted .. (numbers_set[char] or char)
+					end
+			  else
+					converted = converted .. char
+			  end
+		 end
+		 return converted
+	end
+	wait(.2)
+	local function sendchat(msg)
+		chat:SendAsync(convert(msg))
+	end
+
+	sendchat(ChatBox_Input.Text)
+	wait(0.2)
+	ChatBox_Input.Text = ""
 end)
 
 Players.PlayerRemoving:Connect(function(player)
@@ -3115,3 +3366,36 @@ wait(.3)
 SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
 wait(.5)
 SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
+wait(0.5)
+local TweenService = cloneref and cloneref(game:GetService("TweenService")) or game:GetService("TweenService")
+local rainbowFrame = Background
+local tweenDuration = 0.45
+getgenv().rainbow_script = true
+
+local rainbowColors = {
+	Color3.fromRGB(255, 0, 0),
+	Color3.fromRGB(255, 165, 0),
+	Color3.fromRGB(255, 255, 0),
+	Color3.fromRGB(0, 255, 0),
+	Color3.fromRGB(0, 255, 255),
+	Color3.fromRGB(0, 0, 255),
+	Color3.fromRGB(128, 0, 128),
+	Color3.fromRGB(255, 0, 255),
+	Color3.fromRGB(255, 255, 255)
+}
+
+local function tweenRainbow()
+   while getgenv().rainbow_script == true do
+		for i = 1, #rainbowColors do
+			local nextColor = rainbowColors[i]
+			local tweenInfo = TweenInfo.new(tweenDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+			local tween = TweenService:Create(rainbowFrame, tweenInfo, {BackgroundColor3 = nextColor})
+
+			tween:Play()
+			tween.Completed:Wait()
+		end
+		wait(0.2)
+   end
+end
+
+tweenRainbow()
