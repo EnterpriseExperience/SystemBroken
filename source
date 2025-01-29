@@ -272,6 +272,7 @@ local Shaders_Button = Instance.new("TextButton")
 local Day_Button = Instance.new("TextButton")
 local DestroyUI_Button = Instance.new("TextButton")
 local Rejoin_Button = Instance.new("TextButton")
+local NoRainbowUI_Button = Instance.new("TextButton")
 local CMDX_Button = Instance.new("TextButton")
 local InfYield_Button = Instance.new("TextButton")
 local CopyInvite_Button = Instance.new("TextButton")
@@ -292,6 +293,8 @@ local FlyAButton = Instance.new("TextButton")
 local FlyDButton = Instance.new("TextButton")
 local FlyWButton = Instance.new("TextButton")
 local FlySButton = Instance.new("TextButton")
+local FlyEButton = Instance.new("TextButton")
+local FlyQButton = Instance.new("TextButton")
 local OpenClose = Instance.new("ImageButton")
 local UICornerOC = Instance.new("UICorner")
 
@@ -1644,6 +1647,21 @@ Rejoin_Button.TextScaled = true
 Rejoin_Button.TextSize = 14.000
 Rejoin_Button.TextWrapped = true
 
+NoRainbowUI_Button.Name = "NoRainbowUI_Button"
+NoRainbowUI_Button.Parent = Misc_Section
+NoRainbowUI_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+NoRainbowUI_Button.BackgroundTransparency = 0.500
+NoRainbowUI_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+NoRainbowUI_Button.BorderSizePixel = 0
+NoRainbowUI_Button.Position = UDim2.new(0, 25, 0, 320)
+NoRainbowUI_Button.Size = UDim2.new(0, 150, 0, 30)
+NoRainbowUI_Button.Font = Enum.Font.Oswald
+NoRainbowUI_Button.Text = "Turn Off Rainbow UI"
+NoRainbowUI_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+NoRainbowUI_Button.TextScaled = true
+NoRainbowUI_Button.TextSize = 14.000
+NoRainbowUI_Button.TextWrapped = true
+
 CMDX_Button.Name = "CMDX_Button"
 CMDX_Button.Parent = Misc_Section
 CMDX_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
@@ -1768,7 +1786,7 @@ ChatBox_Input.Name = "ChatBox_Input"
 ChatBox_Input.Parent = Misc_Section
 ChatBox_Input.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ChatBox_Input.BorderColor3 = Color3.fromRGB(56, 56, 56)
-ChatBox_Input.Position = UDim2.new(0, 25, 0, 325)
+ChatBox_Input.Position = UDim2.new(0, 25, 0, 360)
 ChatBox_Input.Size = UDim2.new(0, 335, 0, 50)
 ChatBox_Input.Font = Enum.Font.Oswald
 ChatBox_Input.PlaceholderText = "Chat bypass [You won't get banned for your messages]"
@@ -2011,6 +2029,7 @@ CreateToggle(Shaders_Button)
 CreateClicker(Day_Button)
 CreateClicker(DestroyUI_Button)
 CreateClicker(Rejoin_Button)
+CreateClicker(NoRainbowUI_Button)
 CreateClicker(CMDX_Button)
 CreateClicker(Explode_Button)
 CreateClicker(FreeEmotes_Button)
@@ -2285,6 +2304,20 @@ FlyWButton.MouseButton1Down:Connect(function()
 end)
 FlyWButton.MouseButton1Up:Connect(function ()
 	keyrelease("0x57")
+end)
+
+FlyEButton.MouseButton1Up:Connect(function()
+	keypress("0x45")
+end)
+FlyEButton.MouseButton1Down:Connect(function()
+	keyrelease("0x45")
+end)
+
+FlyQButton.MouseButton1Up:Connect(function()
+	keypress("0x51")
+end)
+FlyQButton.MouseButton1Down:Connect(function()
+	keyrelease("0x51")
 end)
 
 --TARGET
@@ -3206,7 +3239,7 @@ ClearChatLogs_Button.MouseButton1Click:Connect(function()
 		chat:SendAsync(msg)
 	end
 	
-	for i = 1, 5 do
+	for i = 1, 6 do
 		sendchat("")
 	end
 	wait(0.5)
@@ -3371,6 +3404,12 @@ end)
 
 Rejoin_Button.MouseButton1Click:Connect(function()
 	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+end)
+
+NoRainbowUI_Button.MouseButton1Click:Connect(function()
+	getgenv().rainbow_script = false
+	getgenv().rainbow_script = false
+	getgenv().rainbow_script = false
 end)
 
 CopyInvite_Button.MouseButton1Click:Connect(function()
