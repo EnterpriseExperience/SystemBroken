@@ -34,7 +34,7 @@ getgenv().ScriptWhitelist = ScriptWhitelist or {}
 local ForceWhitelist = {}
 getgenv().ForceWhitelist = ForceWhitelist or {}
 local TargetedPlayer = nil
-local FlySpeed = 70
+local FlySpeed = 75
 local SavedCheckpoint = nil
 local FreeEmotesEnabled = false
 
@@ -71,7 +71,7 @@ local function GetPlayer(UserDisplay)
 	if UserDisplay ~= "" then
         for i,v in pairs(Players:GetPlayers()) do
             if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
-                return v
+               return v
             end
         end
 		return nil
@@ -316,172 +316,6 @@ local function CreateClicker(Button)
 	local NewClicker = Click_Asset:Clone()
 	NewClicker.Parent = Button
 end
-
-wait(0.1)
-if getgenv().scriptEnabled then
-	warn("Already loaded Emotes Configuration Manager.")
-else
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/emotes_config_manager.lua'))()
-	wait(0.3)
-	-- [] -->> Set up emote/rizz configuration automatically. <<-- [] --
-	local UserInputService = cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
-	local HttpService = cloneref and cloneref(game:GetService("HttpService")) or game:GetService("HttpService")
-	local Players = cloneref and cloneref(game:GetService("Players")) or game:GetService("Players")
-	local LocalPlayer = Players.LocalPlayer
-	local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-	local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 1)
-
-	local emoteFilePath = "emoteFile.json"
-	wait(0.1)
-	local defaultKeybindActions = {
-		[Enum.KeyCode.One] = 13071993910,
-		[Enum.KeyCode.Two] = 14901371589,
-		[Enum.KeyCode.Three] = 73683655527605,
-		[Enum.KeyCode.Four] = 5230615437,
-		[Enum.KeyCode.Five] = 5104377791,
-		[Enum.KeyCode.Six] = 13694139364,
-		[Enum.KeyCode.Seven] = 7466047578,
-		[Enum.KeyCode.Eight] = 13823339506,
-		[Enum.KeyCode.Nine] = 3576823880,
-		[Enum.KeyCode.Q] = "SlowDown",
-		[Enum.KeyCode.E] = "SpeedUp",
-		[Enum.KeyCode.V] = "Freeze",
-		[Enum.KeyCode.X] = "NormalSpeed",
-		[Enum.KeyCode.F] = "Reverse"
-	}
-
-	local function saveDefaultKeybinds(filePath)
-		local keybindList = {}
-		for keyCode, emoteID in pairs(defaultKeybindActions) do
-			table.insert(keybindList, { Key = tostring(keyCode), EmoteID = emoteID })
-		end
-		local success, result = pcall(function()
-			return HttpService:JSONEncode(keybindList)
-		end)
-		if success then
-			writefile(filePath, result)
-			print("Default emote configuration file created at: " .. filePath)
-		else
-			warn("Failed to create default emote configuration file.")
-		end
-	end
-
-	local function loadKeybinds(filePath)  
-		if isfile(filePath) then
-			local success, result = pcall(function()
-				return HttpService:JSONDecode(readfile(filePath))
-			end)
-			if success then
-				getgenv().loadedActions = {}
-				for _, bind in ipairs(result) do
-					if bind.Key and bind.Key:find("Enum.KeyCode") then
-						local keyCode = Enum.KeyCode[tostring(bind.Key):match("Enum.KeyCode%.(%w+)")]
-						if keyCode and (tonumber(bind.EmoteID) or type(bind.EmoteID) == "string") then
-							getgenv().loadedActions[keyCode] = tonumber(bind.EmoteID) or bind.EmoteID
-						end
-					end
-				end
-				return print("Loaded Keybinds:", getgenv().loadedActions)
-			else
-				warn("Failed to parse emote configuration file. Using empty configuration.")
-			end
-		else
-			saveDefaultKeybinds(filePath)
-		end
-		getgenv().loadedActions = {}
-	end
-	wait(0.2)
-	loadKeybinds("emoteFile.json")
-	wait(0.2)
-	getgenv().emoteSpeed = getgenv().emoteSpeed
-	getgenv().speedUpSpeed = getgenv().speedUpSpeed
-	getgenv().slowDownSpeed = getgenv().slowDownSpeed
-	getgenv().freezeEmotes = getgenv().freezeEmotes
-	getgenv().isReversed = getgenv().isReversed
-	wait(0.2)
-	getgenv().emoteSpeed = 1
-	getgenv().speedUpSpeed = 4
-	getgenv().slowDownSpeed = 0.1
-	getgenv().freezeEmotes = false
-	getgenv().isReversed = false
-	wait(0.2)
-	local function adjustEmoteSpeed()
-		if Character and Humanoid then
-			for _, track in ipairs(Humanoid:GetPlayingAnimationTracks()) do
-				track:AdjustSpeed(getgenv().emoteSpeed)
-			end
-		end
-	end
-
-	local function reverseEmotes()
-		if Character and Humanoid then
-			for _, track in ipairs(Humanoid:GetPlayingAnimationTracks()) do
-				track:AdjustSpeed(-1)
-			end
-		end
-	end
-
-	local function playNormalSpeed()
-		if Character and Humanoid then
-			for _, track in ipairs(Humanoid:GetPlayingAnimationTracks()) do
-				track:AdjustSpeed(1)
-			end
-		end
-	end
-
-	local function playEmote(emoteId)
-		local humanoid = Humanoid
-		if humanoid then
-			for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
-				track:Stop()
-			end
-			wait()
-			local animTrack = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
-			if animTrack and typeof(animTrack) == "Instance" then
-				animTrack:AdjustSpeed(getgenv().emoteSpeed)
-			end
-		else
-			warn("Humanoid not found in Character!")
-		end
-	end
-
-	local function handleKeybind(action)
-		if type(action) == "number" then
-			playEmote(action)
-		elseif action == "SlowDown" then
-			getgenv().emoteSpeed = getgenv().slowDownSpeed
-			adjustEmoteSpeed()
-		elseif action == "SpeedUp" then
-			getgenv().emoteSpeed = getgenv().speedUpSpeed
-			adjustEmoteSpeed()
-		elseif action == "Freeze" then
-			getgenv().emoteSpeed = 0
-			adjustEmoteSpeed()
-			getgenv().freezeEmotes = true
-		elseif action == "NormalSpeed" then
-			getgenv().emoteSpeed = 1
-			adjustEmoteSpeed()
-			getgenv().freezeEmotes = false
-		elseif action == "Reverse" then
-			if getgenv().isReversed then
-				playNormalSpeed()
-			else
-				reverseEmotes()
-			end
-			getgenv().isReversed = not getgenv().isReversed
-		end
-	end
-
-	getgenv().keybindConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if gameProcessed then return end
-		local action = getgenv().loadedActions[input.KeyCode]
-		if action then
-			handleKeybind(action)
-		end
-	end)
-	wait(0.2)
-	getgenv().scriptEnabled = true
-end
 wait(0.1)
 SysBroker.Name = tostring(randomString())
 SysBroker.Parent = plr:WaitForChild("PlayerGui")
@@ -580,7 +414,11 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-TitleBarLabel.Text = "			Zacks Modified Broken"
+if getgenv().Easies_Configuration["System_Broken_Title"] == "on" or getgenv().Easies_Configuration["System_Broken_Title"] == "On" or getgenv().Easies_Configuration["System_Broken_Title"] == "Enabled" then
+	TitleBarLabel.Text = tostring(getgenv().Easies_Configuration["System_Broken_Text_Title"])
+else
+	TitleBarLabel.Text = "			Zacks Modified Broken"
+end
 TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
