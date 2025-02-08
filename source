@@ -414,11 +414,6 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-if getgenv().Easies_Configuration["System_Broken_Title"] == "on" or getgenv().Easies_Configuration["System_Broken_Title"] == "On" or getgenv().Easies_Configuration["System_Broken_Title"] == "Enabled" then
-	TitleBarLabel.Text = tostring(getgenv().Easies_Configuration["System_Broken_Text_Title"])
-else
-	TitleBarLabel.Text = "			Zacks Modified Broken"
-end
 TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
