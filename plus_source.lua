@@ -322,7 +322,7 @@ SysBroker.Parent = plr:WaitForChild("PlayerGui")
 SysBroker.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 SysBroker.ResetOnSpawn = false
 SysBroker.IgnoreGuiInset = true
---[[COREGUI = cloneref(game:GetService("CoreGui"))
+--[[COREGUI = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
 local hiddenUI = get_hidden_gui or gethui
 if hiddenUI then
 	SysBroker.Name = tostring(randomString())
@@ -414,11 +414,7 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-if getgenv().Easies_Configuration["System_Broken_Title"] == "on" or getgenv().Easies_Configuration["System_Broken_Title"] == "On" or getgenv().Easies_Configuration["System_Broken_Title"] == "Enabled" then
-	TitleBarLabel.Text = tostring(getgenv().Easies_Configuration["System_Broken_Text_Title"])
-else
-	TitleBarLabel.Text = "			Zacks Modified Broken"
-end
+TitleBarLabel.Text = "			Zacks Modified Broken"
 TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
@@ -3410,5 +3406,3 @@ task.spawn(function()
 end)
 wait(.3)
 SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
-wait(.5)
-SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
