@@ -3198,12 +3198,11 @@ rejoinVoice_Button.MouseButton1Click:Connect(function()
 end)
 
 FaceFk_Button.MouseButton1Click:Connect(function()
-	if getgenv().loaded_face_bang then
-		return warn("Notification:", "Already loaded face f*ck script!")
-	else
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/bruhlolw/refs/heads/main/face_bang_script.lua'))()
-		getgenv().loaded_face_bang = true
-	end
+     return getgenv().GuiService:SendNotification({
+        Title = tostring("Failure!"),
+        Text = tostring("Run Zacks Easy Hub!"),
+     })
+     loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
