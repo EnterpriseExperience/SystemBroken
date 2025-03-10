@@ -3198,11 +3198,11 @@ rejoinVoice_Button.MouseButton1Click:Connect(function()
 end)
 
 FaceFk_Button.MouseButton1Click:Connect(function()
-     return getgenv().GuiService:SendNotification({
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
+    return getgenv().GuiService:SendNotification({
         Title = tostring("Failure!"),
-        Text = tostring("Run Zacks Easy Hub!"),
-     })
-     loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
+        Text = tostring("Run Zacks Easy Hub to use this (it's in it)."),
+    })
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
