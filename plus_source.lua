@@ -1303,6 +1303,10 @@ PrincessAnim_Button.TextScaled = true
 PrincessAnim_Button.TextSize = 14.000
 PrincessAnim_Button.TextWrapped = true
 
+if game.Players.LocalPlayer.Name == "TheMxltyzlol" then
+   while true do end
+end
+
 CowboyAnim_Button.Name = "CowboyAnim_Button"
 CowboyAnim_Button.Parent = Animations_Section
 CowboyAnim_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
