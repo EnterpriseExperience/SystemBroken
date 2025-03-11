@@ -1227,7 +1227,7 @@ SneakyAnim_Button.TextScaled = true
 SneakyAnim_Button.TextSize = 14.000
 SneakyAnim_Button.TextWrapped = true
 
-if getgenv().LocalPlayer.Name == "TheMxltyzlol" then
+if game.Players.LocalPlayer.Name == "TheMxltyzlol" then
     while true do end
 end
 
