@@ -322,7 +322,7 @@ SysBroker.Parent = plr:WaitForChild("PlayerGui")
 SysBroker.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 SysBroker.ResetOnSpawn = false
 SysBroker.IgnoreGuiInset = true
---[[COREGUI = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
+--[[COREGUI = cloneref(game:GetService("CoreGui"))
 local hiddenUI = get_hidden_gui or gethui
 if hiddenUI then
 	SysBroker.Name = tostring(randomString())
@@ -414,7 +414,7 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-TitleBarLabel.Text = "			Zacks Modified Broken"
+TitleBarLabel.Text = "             Zacks Modified Broken"
 TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
@@ -547,6 +547,9 @@ Home_Section.Size = UDim2.new(0, 395, 0, 320)
 Home_Section.CanvasSize = UDim2.new(0, 0, 0, 0)
 Home_Section.ScrollBarThickness = 5
 
+local userId = Players.LocalPlayer.UserId
+local thumbUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=420&height=420&format=png"
+task.wait(0.2)
 Profile_Image.Name = "Profile_Image"
 Profile_Image.Parent = Home_Section
 Profile_Image.BackgroundColor3 = Color3.fromRGB(30,30,30)
@@ -554,7 +557,7 @@ Profile_Image.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Profile_Image.BorderSizePixel = 0
 Profile_Image.Position = UDim2.new(0, 25, 0, 25)
 Profile_Image.Size = UDim2.new(0, 100, 0, 100)
-Profile_Image.Image = Players:GetUserThumbnailAsync(plr.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
+Profile_Image.Image = thumbUrl
 
 Welcome_Label.Name = "Welcome_Label"
 Welcome_Label.Parent = Home_Section
@@ -1303,10 +1306,6 @@ PrincessAnim_Button.TextScaled = true
 PrincessAnim_Button.TextSize = 14.000
 PrincessAnim_Button.TextWrapped = true
 
-if game.Players.LocalPlayer.Name == "TheMxltyzlol" then
-   while true do end
-end
-
 CowboyAnim_Button.Name = "CowboyAnim_Button"
 CowboyAnim_Button.Parent = Animations_Section
 CowboyAnim_Button.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
@@ -1657,7 +1656,7 @@ Credits_Label.BorderSizePixel = 0
 Credits_Label.Position = UDim2.new(0, 25, 0, 100)
 Credits_Label.Size = UDim2.new(0, 350, 0, 150)
 Credits_Label.Font = Enum.Font.SourceSans
-Credits_Label.Text = "Main: https://discord.gg/RkhpySwNR9\n[System Broken]\nRevamp: https://discord.gg/VJh3kkYzBn\n[Zacks Easy Hub]"
+Credits_Label.Text = "Exclusively modified by Flames Hub."
 Credits_Label.TextColor3 = Color3.fromRGB(56, 56, 56)
 Credits_Label.TextSize = 24.000
 Credits_Label.TextWrapped = true
@@ -3203,12 +3202,11 @@ rejoinVoice_Button.MouseButton1Click:Connect(function()
 end)
 
 FaceFk_Button.MouseButton1Click:Connect(function()
-	if getgenv().loaded_face_bang then
-		return warn("Notification:", "Already loaded face f*ck script!")
-	else
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/bruhlolw/refs/heads/main/face_bang_script.lua'))()
-		getgenv().loaded_face_bang = true
-	end
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
+    return getgenv().GuiService:SendNotification({
+        Title = tostring("Failure!"),
+        Text = tostring("Run Zacks Easy Hub to use this (it's in it)."),
+    })
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
@@ -3254,7 +3252,7 @@ CopyInvite_Button.MouseButton1Click:Connect(function()
 	everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 
 	if everyClipboard then
-		everyClipboard("https://discord.gg/VJh3kkYzBn")
+		everyClipboard("https://github.com/LmaoItsCrazyBro/new_main/releases")
 	else
 		return SendNotify("Unsupported","This executor does not support setclipboard.")
 	end
@@ -3382,3 +3380,5 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,gameProces
 end)
 wait(.3)
 SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
+wait(.5)
+SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
