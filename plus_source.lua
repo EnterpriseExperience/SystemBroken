@@ -74,9 +74,9 @@ local function GetPlayer(UserDisplay)
                return v
             end
         end
-		return nil
+	     return nil
 	else
-		return nil
+	     return nil
     end
 end
 
@@ -414,7 +414,7 @@ TitleBarLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TitleBarLabel.BorderSizePixel = 0
 TitleBarLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleBarLabel.Font = Enum.Font.Unknown
-TitleBarLabel.Text = "             Zacks Modified Broken"
+TitleBarLabel.Text = "             Flames Modified Broken"
 TitleBarLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 TitleBarLabel.TextScaled = true
 TitleBarLabel.TextSize = 14.000
@@ -3205,7 +3205,7 @@ FaceFk_Button.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
     return getgenv().GuiService:SendNotification({
         Title = tostring("Failure!"),
-        Text = tostring("Run Zacks Easy Hub to use this (it's in it)."),
+        Text = tostring("Run Flames Hub to use this (it's in it)."),
     })
 end)
 
@@ -3382,3 +3382,36 @@ wait(.3)
 SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
 wait(.5)
 SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
+wait(0.5)
+local TweenService = cloneref and cloneref(game:GetService("TweenService")) or game:GetService("TweenService")
+local rainbowFrame = Background
+local tweenDuration = 0.45
+getgenv().rainbow_script = true
+
+local rainbowColors = {
+	Color3.fromRGB(255, 0, 0),
+	Color3.fromRGB(255, 165, 0),
+	Color3.fromRGB(255, 255, 0),
+	Color3.fromRGB(0, 255, 0),
+	Color3.fromRGB(0, 255, 255),
+	Color3.fromRGB(0, 0, 255),
+	Color3.fromRGB(128, 0, 128),
+	Color3.fromRGB(255, 0, 255),
+	Color3.fromRGB(255, 255, 255)
+}
+
+local function tweenRainbow()
+   while getgenv().rainbow_script == true do
+		for i = 1, #rainbowColors do
+			local nextColor = rainbowColors[i]
+			local tweenInfo = TweenInfo.new(tweenDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+			local tween = TweenService:Create(rainbowFrame, tweenInfo, {BackgroundColor3 = nextColor})
+
+			tween:Play()
+			tween.Completed:Wait()
+		end
+		wait(0.2)
+   end
+end
+
+tweenRainbow()
