@@ -13,10 +13,10 @@ local speaker = LocalPlayer or Players.LocalPlayer
 local localplayer = LocalPlayer or Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local character = Character or LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 1)
+local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 5)
 local human = Humanoid
 local Human = Humanoid
-local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart") or Character:WaitForChild("HumanoidRootPart", 1)
+local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart") or Character:WaitForChild("HumanoidRootPart", 5)
 local hrp = HumanoidRootPart
 local humanoidRootPart = HumanoidRootPart
 local Workspace = cloneref and cloneref(game:GetService("Workspace")) or game:GetService("Workspace")
@@ -3202,11 +3202,11 @@ rejoinVoice_Button.MouseButton1Click:Connect(function()
 end)
 
 FaceFk_Button.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
-    return getgenv().GuiService:SendNotification({
-        Title = tostring("Failure!"),
-        Text = tostring("Run Flames Hub to use this (it's in it)."),
-    })
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
+	return getgenv().GuiService:SendNotification({
+		Title = tostring("Failure!"),
+		Text = tostring("Run Flames Hub to use this (it's in it)."),
+	})
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
@@ -3218,28 +3218,35 @@ CMDX_Button.MouseButton1Click:Connect(function()
 end)
 
 Explode_Button.MouseButton1Click:Connect(function()
-	plr.Character.Humanoid:ChangeState(0)
+	local Character = plr.Character or plr.CharacterAdded:Wait()
+	local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid", 3)
+
+	Humanoid:ChangeState(0)
 	local bav = Instance.new("BodyAngularVelocity")
 	bav.Parent = GetRoot(plr)
 	bav.Name = "Spin"
 	bav.MaxTorque = Vector3.new(0,math.huge,0)
 	bav.AngularVelocity = Vector3.new(0,150,0)
 	task.wait(3)
-	plr.Character:WaitForChild("Humanoid"):ChangeState(15)
+	Humanoid:ChangeState(15)
 end)
 
 FreeEmotes_Button.MouseButton1Click:Connect(function()
+	local StarterGui = cloneref and cloneref(game:GetService("StarterGui")) or game:GetService("StarterGui")
+
 	if not FreeEmotesEnabled then
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes Loaded",Text = "Press , or use the button on the left side.",Duration = 5;})
+		StarterGui:SetCore("SendNotification", {Title = "Free Emotes Loaded",Text = "Press , or use the button on the left side.",Duration = 5;})
 		task.wait()
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen btw.]",Duration = 5;})
+		StarterGui:SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen.]",Duration = 5;})
 		FreeEmotesEnabled = true
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/LmaoItsCrazyBro/qweytguqwebuqt/refs/heads/main/marked_esp_system_ai"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/EmotesGUI"))()
 	end
 end)
 
 Rejoin_Button.MouseButton1Click:Connect(function()
-	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+	local TeleportService = cloneref and cloneref(game:GetService("TeleportService")) or game:GetService("TeleportService")
+
+	TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
 end)
 
 NoRainbowUI_Button.MouseButton1Click:Connect(function()
@@ -3252,9 +3259,9 @@ CopyInvite_Button.MouseButton1Click:Connect(function()
 	everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 
 	if everyClipboard then
-		everyClipboard("https://github.com/LmaoItsCrazyBro/new_main/releases")
+		everyClipboard("https://github.com/EnterpriseExperience/MicUpSource/wiki")
 	else
-		return SendNotify("Unsupported","This executor does not support setclipboard.")
+		return SendNotify("Unsupported", "This executor does not support setclipboard.")
 	end
 end)
 
@@ -3309,31 +3316,31 @@ ChatBox_Input.FocusLost:Connect(function()
 	}
 
 	local function convert(text)
-		 local letters_set = letters["set1"]
-		 local numbers_set = numbers["set1"]
-	
-		 local converted = ""
-		 for i = 1, #text do
-			  local char = text:sub(i, i)
-			  local lower_char = char:lower()
-	
-			  if char:match("%a") then
-					if lettersBypass then
-						 converted = converted .. char
-					else
-						 converted = converted .. (letters_set[lower_char] or char)
-					end
-			  elseif char:match("%d") then
-					if numbersBypass then
-						 converted = converted .. char
-					else
-						 converted = converted .. (numbers_set[char] or char)
-					end
-			  else
+		local letters_set = letters["set1"]
+		local numbers_set = numbers["set1"]
+
+		local converted = ""
+		for i = 1, #text do
+			local char = text:sub(i, i)
+			local lower_char = char:lower()
+
+			if char:match("%a") then
+				if lettersBypass then
 					converted = converted .. char
-			  end
-		 end
-		 return converted
+				else
+					converted = converted .. (letters_set[lower_char] or char)
+				end
+			elseif char:match("%d") then
+				if numbersBypass then
+					converted = converted .. char
+				else
+					converted = converted .. (numbers_set[char] or char)
+				end
+			else
+				converted = converted .. char
+			end
+		end
+		return converted
 	end
 	wait(.2)
 	local function sendchat(msg)
@@ -3379,9 +3386,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,gameProces
 	end
 end)
 wait(.3)
-SendNotify("Hello", tostring(game.Players.LocalPlayer.Name))
-wait(.5)
-SendNotify("NEW!", "System broken has been modified for this script! EXCLUSIVELY!")
+SendNotify("Hello", tostring(LocalPlayer.DisplayName))
 wait(0.5)
 local TweenService = cloneref and cloneref(game:GetService("TweenService")) or game:GetService("TweenService")
 local rainbowFrame = Background
