@@ -1,11 +1,15 @@
 --RELOAD GUI
 if getgenv().GUI_Loaded then
-	game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Alert:",Text = "GUI Already loaded, Destroy GUI to re-execute",Duration = 10;})
-	return 
+	if getgenv().notify then
+		return getgenv().notify("Warning", "System Broken has already been loaded, please unload it first before trying to execute it again.", 15)
+	else
+		return 
+	end
 end
-local version = 2
---VARIABLES
-_G.AntiFlingToggled = false
+local version = 3.5
+local g = getgenv() or _G or {}
+wait(0.1)
+g.AntiFlingToggled = g.AntiFlingToggled or false
 local Players = cloneref and cloneref(game:GetService("Players")) or game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local plr = LocalPlayer or Players.LocalPlayer
@@ -29,23 +33,50 @@ local httprequest = (syn and syn.request) or (http and http.request) or http_req
 local mouse = plr:GetMouse()
 local IYMouse = mouse or LocalPlayer:GetMouse()
 local Mouse = mouse or IYMouse or LocalPlayer:GetMouse()
-local ScriptWhitelist = {}
-getgenv().ScriptWhitelist = ScriptWhitelist or {}
-local ForceWhitelist = {}
-getgenv().ForceWhitelist = ForceWhitelist or {}
+g.ScriptWhitelist = g.ScriptWhitelist or {}
+g.ForceWhitelist = g.ForceWhitelist or {}
 local TargetedPlayer = nil
 local FlySpeed = 75
 local SavedCheckpoint = nil
-local FreeEmotesEnabled = false
+g.FreeEmotesEnabled = g.FreeEmotesEnabled or false
+local FW = g.ForceWhitelist
+g.blankfunction = g.blankfunction or function(...)
+   return ...
+end
 
---FUNCTIONS
-_G.shield = function(id)
-	if not table.find(ForceWhitelist,id) then
-		table.insert(ForceWhitelist, id)
+for i, id in ipairs(FW) do
+   FW[id] = true
+end
+
+g.shield = function(id)
+	FW[id] = true
+	if not table.find(FW, id) then
+		table.insert(FW, id)
 	end
 end
 
-local function RandomChar()
+g.unshield = function(id)
+	FW[id] = nil
+
+	for i = #FW, 1, -1 do
+		if FW[i] == id then
+			table.remove(FW, i)
+		end
+	end
+end
+
+g.is_whitelisted_system_broken = function(id)
+	return FW[id] or table.find(FW, id) ~= nil
+end
+
+-- [[ FUNCTIONS ]] --
+g.shield = function(id)
+	if not table.find(g.ForceWhitelist, id) then
+		table.insert(g.ForceWhitelist, id)
+	end
+end
+
+g.RandomChar = function()
 	local length = math.random(1,5)
 	local array = {}
 	for i = 1, length do
@@ -63,71 +94,278 @@ local function ChangeToggleColor(Button)
 	end
 end
 
-local function GetPing()
+g.GetPing = function()
 	return (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())/1000
 end
 
-local function GetPlayer(UserDisplay)
+g.GetPlayer = function(UserDisplay)
 	if UserDisplay ~= "" then
-        for i,v in pairs(Players:GetPlayers()) do
-            if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
-               return v
-            end
-        end
-	     return nil
+		for i,v in pairs(Players:GetPlayers()) do
+			if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
+				return v
+			end
+		end
+		return nil
 	else
-	     return nil
-    end
+		return nil
+	end
 end
 
-local function GetCharacter(Player)
-	if Player.Character then
+g.get_char = function(Player, timeout)
+	if not Player or not Player:IsA("Player") then return nil end
+
+	timeout = tonumber(timeout) or 60
+	local start = os.clock()
+	local current_char
+	local diedconn
+	local added_conn
+
+	local function hookchar(char)
+		if not char or not char.Parent then return end
+		current_char = char
+
+		if diedconn then diedconn:Disconnect() end
+
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum then
+			diedconn = hum.Died:Once(function()
+				current_char = nil
+			end)
+		end
+	end
+
+	if Player.Character and Player.Character.Parent then
+		hookchar(Player.Character)
+	end
+
+	added_conn = Player.CharacterAdded:Connect(hookchar)
+
+	while not current_char and os.clock() - start < timeout do
+		task.wait()
+		local char = Player.Character
+		if char and char.Parent then
+			hookchar(char)
+		end
+	end
+
+	if added_conn then added_conn:Disconnect() end
+
+	return current_char
+end
+
+g.get_head = function(Player, timeout)
+	if not Player or not Player:IsA("Player") then return nil end
+
+	timeout = tonumber(timeout) or 30
+	local start = os.clock()
+
+	local char = g.get_char(Player, timeout)
+	if not char then return nil end
+
+	local head = char:FindFirstChild("Head")
+	if head then return head end
+
+	local died = false
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.Died:Connect(function()
+			died = true
+		end)
+	end
+
+	local added_conn
+	added_conn = char.ChildAdded:Connect(function(c)
+		if c.Name == "Head" then
+			head = c
+		end
+	end)
+
+	while not head and not died and os.clock() - start < timeout do
+		task.wait()
+	end
+
+	if added_conn then added_conn:Disconnect() end
+
+	return (not died and head) or nil
+end
+
+g.get_human = function(Player, timeout)
+	if not Player or not Player:IsA("Player") then return nil end
+
+	timeout = tonumber(timeout) or 30
+	local start = os.clock()
+
+	local char = g.get_char(Player, timeout)
+	if not char then return nil end
+
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum then return hum end
+
+	local died = false
+	local died_conn
+
+	local added_conn
+	added_conn = char.ChildAdded:Connect(function(c)
+		if c:IsA("Humanoid") then
+			hum = c
+		end
+	end)
+
+	while not hum and os.clock() - start < timeout do
+		task.wait()
+		if hum and not died_conn then
+			died_conn = hum.Died:Connect(function()
+				died = true
+			end)
+		end
+		if died then break end
+	end
+
+	if added_conn then added_conn:Disconnect() end
+	if died_conn then died_conn:Disconnect() end
+
+	return (not died and hum) or nil
+end
+
+g.get_root = function(Player, timeout)
+	if not Player or not Player:IsA("Player") then return nil end
+
+	timeout = tonumber(timeout) or 30
+	local start = os.clock()
+
+	local char = g.get_char(Player, timeout)
+	if not char then return nil end
+
+	local root =
+		char:FindFirstChild("HumanoidRootPart")
+		or char:FindFirstChild("UpperTorso")
+		or char:FindFirstChild("Torso")
+
+	if root then return root end
+
+	local targets = {
+		HumanoidRootPart = true,
+		UpperTorso = true,
+		Torso = true
+	}
+
+	local died = false
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.Died:Connect(function()
+			died = true
+		end)
+	end
+
+	local added_conn
+	added_conn = char.ChildAdded:Connect(function(c)
+		if targets[c.Name] then
+			root = c
+		end
+	end)
+
+	while not root and not died and os.clock() - start < timeout do
+		task.wait()
+	end
+
+	if added_conn then added_conn:Disconnect() end
+
+	return (not died and root) or nil
+end
+
+g.GetCharacter = function(Player)
+	if not Player or not Player:IsA("Player") then
+		return nil
+	end
+
+	if Player.Character and Player.Character.Parent then
 		return Player.Character
 	end
+
+	return g.get_char(Player, 30)
+end
+wait(0.1)
+g.GetRoot = function(Player)
+	if not Player or not Player:IsA("Player") then return nil end
+	return g.get_root(Player, 30)
 end
 
-local function GetRoot(Player)
-	if GetCharacter(Player):FindFirstChild("HumanoidRootPart") then
-		return GetCharacter(Player).HumanoidRootPart
-	end
-end
-
-local function TeleportTO(posX,posY,posZ,player,method)
+g.TeleportTO = function(posX, posY, posZ, target, method)
 	pcall(function()
+		local function get_target_cframe()
+			if target == "pos" then
+				return CFrame.new(posX, posY, posZ)
+			end
+
+			if typeof(target) == "Instance" then
+				local char = target.Character
+				if char and char.GetPivot then
+					return char:GetPivot() + Vector3.new(0, 2, 0)
+				end
+			end
+		end
+
+		local function pivot_local()
+			local lp_char = g.GetCharacter(plr)
+			if lp_char and lp_char.PivotTo then
+				local cf = get_target_cframe()
+				if cf then
+					lp_char:PivotTo(cf)
+				end
+			end
+		end
+
 		if method == "safe" then
 			task.spawn(function()
-				for i = 1,30 do
+				for i = 1, 30 do
 					task.wait()
-					GetRoot(plr).Velocity = Vector3.new(0,0,0)
-					if player == "pos" then
-						GetRoot(plr).CFrame = CFrame.new(posX,posY,posZ)
-					else
-						GetRoot(plr).CFrame = CFrame.new(GetRoot(player).Position)+Vector3.new(0,2,0)
-					end
+					pivot_local()
 				end
 			end)
 		else
-			GetRoot(plr).Velocity = Vector3.new(0,0,0)
-			if player == "pos" then
-				GetRoot(plr).CFrame = CFrame.new(posX,posY,posZ)
-			else
-				GetRoot(plr).CFrame = CFrame.new(GetRoot(player).Position)+Vector3.new(0,2,0)
-			end
+			pivot_local()
 		end
 	end)
 end
 
-local function PredictionTP(player,method)
-	local root = GetRoot(player)
-	local pos = root.Position
-	local vel = root.Velocity
-	GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
-	if method == "safe" then
-		task.wait()
-		GetRoot(plr).CFrame = CFrame.new(pos)
-		task.wait()
-		GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
-	end
+g.PredictionTP = function(player, method)
+	pcall(function()
+		if not player or not player.Character then return end
+
+		local target_char = player.Character
+		local target_root = target_char:FindFirstChild("HumanoidRootPart")
+		if not target_root then return end
+		local pos = target_root.Position
+		local vel = target_root.Velocity
+		local ping = GetPing()
+
+		local predicted_cf = CFrame.new(
+			pos.X + vel.X * (ping * 3.5),
+			pos.Y + vel.Y * (ping * 2),
+			pos.Z + vel.Z * (ping * 3.5)
+		)
+
+		local function move_local(cf)
+			local lp_char = g.GetCharacter(plr)
+			if not lp_char then return end
+
+			local lp_root = lp_char:FindFirstChild("HumanoidRootPart")
+			if lp_root then
+				lp_root.CFrame = cf
+			elseif lp_char.PivotTo then
+				lp_char:PivotTo(cf)
+			end
+		end
+
+		move_local(predicted_cf)
+
+		if method == "safe" then
+			task.wait()
+			move_local(CFrame.new(pos))
+			task.wait()
+			move_local(predicted_cf)
+		end
+	end)
 end
 
 local function Touch(x,root)
@@ -177,8 +415,24 @@ local function StopAnim()
 	end
 end
 
-local function SendNotify(title, message, duration)
-	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title,Text = message,Duration = duration;})
+local NotifyLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/Notification_Lib.lua"))()
+local valid_titles = {success="Success",info="Info",warning="Warning",error="Error",succes="Success",sucess="Success",eror="Error",erorr="Error",warnin="Warning"}
+local function format_title(str)
+   if typeof(str) ~= "string" then
+      return "Info"
+   end
+
+   local key = str:lower()
+   return valid_titles[key] or "Info"
+end
+
+g.notify = g.notify or function(title, msg, dur)
+   local fixed_title = format_title(title)
+   NotifyLib:External_Notification(fixed_title, tostring(msg), tonumber(dur))
+end
+wait(0.2)
+g.SendNotify = function(title, message, duration)
+	g.notify(title, message, duration)
 end
 
 httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
@@ -354,57 +608,54 @@ if Background.Draggable or Background.Draggable == true then
 	Background.Draggable = false
 end
 wait(0.1)
-local UIS = game:GetService("UserInputService")
-
+local UIS = UserInputService or cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
 local guiObject = Background
-
 local dragging = false
 local dragStart, startPos
 local smoothSpeed = 0.1
 local lastInput
-
 local function update()
-    if not dragging or not lastInput then return end
+	if not dragging or not lastInput then return end
 
-    local delta = lastInput.Position - dragStart
-    local goalPosition = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
+	local delta = lastInput.Position - dragStart
+	local goalPosition = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
 
-    guiObject.Position = guiObject.Position:Lerp(goalPosition, smoothSpeed)
+	guiObject.Position = guiObject.Position:Lerp(goalPosition, smoothSpeed)
 end
 
 guiObject.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = guiObject.Position
-        lastInput = input
-    end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = guiObject.Position
+		lastInput = input
+	end
 end)
 
 guiObject.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        lastInput = input
-    end
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		lastInput = input
+	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-    if dragging and input == lastInput then
-        update()
-    end
+	if dragging and input == lastInput then
+		update()
+	end
 end)
 
 UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
 end)
 wait(0.2)
-getgenv().GUI_Loaded = true
+g.GUI_Loaded = true
 wait(0.1)
 TitleBarLabel.Name = "TitleBarLabel"
 TitleBarLabel.Parent = Background
@@ -1897,7 +2148,7 @@ end
 local function UpdateTarget(player)
 	pcall(function()
 		if table.find(ForceWhitelist,player.UserId) then
-			SendNotify("System Broken","You cant target this player: @"..player.Name.." / "..player.DisplayName,5)
+			SendNotify("Info","You cant target this player: @"..player.Name.." / "..player.DisplayName,5)
 			player = nil
 		end
 	end)
@@ -1963,7 +2214,7 @@ end)
 CMDBar.FocusLost:Connect(function()
 	command = CMDBar.Text
 	Players:Chat(command)
-	SendNotify("System Broken",("Executed "..command),5)
+	SendNotify("Info",("Executed "..command),5)
 	CMDBar.Text = ""
 end)
 
@@ -1976,7 +2227,7 @@ WalkSpeed_Button.MouseButton1Click:Connect(function()
 			Speed = 16
 		end
 		plr.Character.Humanoid.WalkSpeed = tonumber(Speed)
-		SendNotify("System Broken","Walk speed updated.",5)
+		SendNotify("Info","Walk speed updated.",5)
 	end)
 end)
 
@@ -1987,7 +2238,7 @@ JumpPower_Button.MouseButton1Click:Connect(function()
 			Power = 50
 		end
 		plr.Character.Humanoid.JumpPower = tonumber(Power)
-		SendNotify("System Broken","Jump power updated.",5)
+		SendNotify("Info","Jump power updated.",5)
 	end)
 end)
 
@@ -1998,7 +2249,7 @@ FlySpeed_Button.MouseButton1Click:Connect(function()
 			Speed = 50
 		end
 		FlySpeed = tonumber(Speed)
-		SendNotify("System Broken","Fly speed updated.",5)
+		SendNotify("Info","Fly speed updated.",5)
 	end)
 end)
 
@@ -2011,12 +2262,12 @@ end)
 
 SaveCheckpoint_Button.MouseButton1Click:Connect(function()
 	SavedCheckpoint = GetRoot(plr).Position
-	SendNotify("System Broken","Checkpoint saved.",5)
+	SendNotify("Info","Checkpoint saved.",5)
 end)
 
 ClearCheckpoint_Button.MouseButton1Click:Connect(function()
 	SavedCheckpoint = nil
-	SendNotify("System Broken","Checkpoint cleared.",5)
+	SendNotify("Info","Checkpoint cleared.",5)
 end)
 
 local flying = true
@@ -2441,10 +2692,10 @@ WhitelistTarget_Button.MouseButton1Click:Connect(function()
 					table.remove(ScriptWhitelist, i)
 				end
 			end
-			SendNotify("[SYSTEM]:",TargetedPlayer.." removed from whitelist.",5)
+			SendNotify("Info", tostring(TargetedPlayer).." removed from whitelist.", 5)
 		else
 			table.insert(ScriptWhitelist, Players[TargetedPlayer].UserId)
-			SendNotify("[SYSTEM]:",TargetedPlayer.." added to whitelist.", 5)
+			SendNotify("Info", tostring(TargetedPlayer).." added to whitelist.", 5)
 		end
 	end
 end)
@@ -2975,10 +3226,10 @@ end)
 AntiFling_Button.MouseButton1Click:Connect(function()
 	ChangeToggleColor(AntiFling_Button)
 	if AntiFling_Button.Ticket_Asset.ImageColor3 == Color3.fromRGB(0,255,0) then
-		_G.AntiFlingToggled = true
+		g.AntiFlingToggled = true
 		loadstring(game:HttpGet('https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/AntiFling'))()
 	else
-		_G.AntiFlingToggled = false
+		g.AntiFlingToggled = false
 	end
 end)
 
@@ -3058,14 +3309,14 @@ Day_Button.MouseButton1Click:Connect(function()
 	if Shaders_Button.Ticket_Asset.ImageColor3 == Color3.fromRGB(255,0,0) then
 		game:GetService("Lighting").ClockTime = 14
 	else
-		SendNotify("System Broken","Please turn off shaders.",5)
+		SendNotify("Info", "Please turn off shaders.", 5)
 	end
 end)
 
 DestroyUI_Button.MouseButton1Click:Connect(function()
 	SysBroker:Destroy()
-	getgenv().GUI_Loaded = false
-	getgenv().rainbow_script = false
+	g.GUI_Loaded = false
+	g.rainbow_script = false
 end)
 
 ClearChatLogs_Button.MouseButton1Click:Connect(function()
@@ -3201,19 +3452,197 @@ rejoinVoice_Button.MouseButton1Click:Connect(function()
 	VoiceChatService:joinVoice()
 end)
 
+g.face_fck_enabled = g.face_fck_enabled or false
+g.loaded_face_bang = g.loaded_face_bang or false
+g.face_fck_conn = g.face_fck_conn or nil
+g.face_fck_inputBeganConn = g.face_fck_inputBeganConn or nil
+g.face_fck_inputEndedConn = g.face_fck_inputEndedConn or nil
+g.running = g.running or false
+local fKey = Enum.KeyCode.Z
+local speed = 3
+local distSlider = 3
+
+local function stop()
+	g.loaded_face_bang = false
+
+	if g.face_fck_conn then
+		g.face_fck_conn:Disconnect()
+		g.face_fck_conn = nil
+	end
+
+	local hum = Humanoid or get_human(LocalPlayer or game.Players.LocalPlayer, 30)
+	if hum then
+		hum.PlatformStand = false
+	end
+
+	g.running = false
+end
+
+local function face_fck()
+	if g.running then return end
+	g.running = true
+
+	local plr = LocalPlayer
+	local char = Character or get_char(LocalPlayer or game.Players.LocalPlayer, 60)
+	if not char then g.running = false return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart") or get_root(LocalPlayer or game.Players.LocalPlayer, 45)
+	local hum = char:FindFirstChild("Humanoid") or char:FindFirstChildWhichIsA("Humanoid") or get_human(LocalPlayer or game.Players.LocalPlayer, 30)
+
+	local closest, dist = nil, math.huge
+	g.loaded_face_bang = true
+
+	for _, target in ipairs(Players:GetPlayers()) do
+		if target ~= plr and target.Character then
+			local head = target.Character:FindFirstChild("Head") or get_head(target, 60)
+			if head then
+				local d = (head.Position - hrp.Position).Magnitude
+				if d < dist then
+					closest = target
+					dist = d
+				end
+			end
+		end
+	end
+
+	if not closest then
+		g.running = false
+		return
+	end
+
+	local head = closest.Character and closest.Character:FindFirstChild("Head") or get_head(closest, 35)
+	if not head then
+		g.running = false
+		return
+	end
+
+	hum.PlatformStand = true
+
+	local init = true
+	local out = true
+	local min = -0.9
+	local base = 2
+	local last = tick()
+	local prog = 0
+
+	g.face_fck_conn = RunService.Heartbeat:Connect(function()
+		hrp.Velocity = Vector3.new(0, 0, 0)
+
+		local back = head.CFrame * CFrame.new(0, 0, 1)
+		local front = head.CFrame * CFrame.new(0, 0, -1)
+		local dir = (back.Position - front.Position).Unit
+		local max = -distSlider
+
+		if init then
+			local pos = back.Position + dir * max
+			hrp.CFrame = CFrame.new(pos + Vector3.new(0, 0.5, 0))
+			init = false
+			last = tick()
+			return
+		end
+
+		local now = tick()
+		local dt = now - last
+		last = now
+
+		local spd = base * speed
+
+		if out then
+			prog = math.min(1, prog + dt * spd)
+		else
+			prog = math.max(0, prog - dt * spd)
+		end
+
+		local curr = min + (max - min) * prog
+		local targetPos = back.Position + dir * curr
+		local newPos = hrp.Position:Lerp(targetPos, 0.5) + Vector3.new(0, 0.5, 0)
+		local hCF = head.CFrame
+
+		hrp.CFrame = CFrame.new(newPos) * (hCF - hCF.Position) * CFrame.Angles(0, math.rad(180), 0)
+
+		if prog >= 1 or prog <= 0 then
+			out = not out
+		end
+	end)
+end
+
+g.enable_face_fck = function()
+	if g.face_fck_enabled then return end
+	g.face_fck_enabled = true
+
+	g.face_fck_inputBeganConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not gameProcessed and input.KeyCode == fKey then
+			face_fck()
+		end
+	end)
+
+	g.face_fck_inputEndedConn = UserInputService.InputEnded:Connect(function(input, gameProcessed)
+		if not gameProcessed and input.KeyCode == fKey then
+			stop()
+		end
+	end)
+end
+
+g.disable_face_fck = function()
+	if not g.face_fck_enabled then return end
+	g.face_fck_enabled = false
+
+	if g.face_fck_inputBeganConn then
+		g.face_fck_inputBeganConn:Disconnect()
+		g.face_fck_inputBeganConn = nil
+	end
+
+	if g.face_fck_inputEndedConn then
+		g.face_fck_inputEndedConn:Disconnect()
+		g.face_fck_inputEndedConn = nil
+	end
+
+	stop()
+end
+
+g.toggle_face_fck = function()
+	wait(0.1)
+	if not g.face_fck_enabled then
+		if g.enable_face_fck then
+			g.enable_face_fck()
+			if getgenv().notify then
+				getgenv().notify("Success", "Enabled Face F**k script.", 3)
+			end
+		end
+	else
+		if g.disable_face_fck then
+			g.disable_face_fck()
+			if getgenv().notify then
+				getgenv().notify("Success", "Disabled Face F**k script.", 3)
+			else
+				return 
+			end
+		end
+	end
+end
+
 FaceFk_Button.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua'))()
-	return getgenv().GuiService:SendNotification({
-		Title = tostring("Failure!"),
-		Text = tostring("Run Flames Hub to use this (it's in it)."),
-	})
+	task.wait(.2)
+	g.toggle_face_fck()
 end)
 
 InfYield_Button.MouseButton1Click:Connect(function()
+	if getgenv().GET_LOADED_IY then
+		return 
+	end
+	if getgenv().IY_LOADED then
+		return 
+	end
+
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 end)
 
 CMDX_Button.MouseButton1Click:Connect(function()
+	if getgenv().CMD_X_LOADED_SCRIPT then
+		return 
+	end
+
+	getgenv().CMD_X_LOADED_SCRIPT = true
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source",true))()
 end)
 
@@ -3232,26 +3661,38 @@ Explode_Button.MouseButton1Click:Connect(function()
 end)
 
 FreeEmotes_Button.MouseButton1Click:Connect(function()
-	local StarterGui = cloneref and cloneref(game:GetService("StarterGui")) or game:GetService("StarterGui")
+	if g.FreeEmotesEnabled then
+		return 
+	end
+	if getgenv().run_service_gaze_emotes_check then
+		return 
+	end
 
-	if not FreeEmotesEnabled then
-		StarterGui:SetCore("SendNotification", {Title = "Free Emotes Loaded",Text = "Press , or use the button on the left side.",Duration = 5;})
-		task.wait()
-		StarterGui:SetCore("SendNotification", {Title = "Free Emotes:",Text = "[Of your screen.]",Duration = 5;})
-		FreeEmotesEnabled = true
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/EmotesGUI"))()
+	if not g.FreeEmotesEnabled then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/flames_emotes_gui_new.lua"))()
 	end
 end)
 
 Rejoin_Button.MouseButton1Click:Connect(function()
 	local TeleportService = cloneref and cloneref(game:GetService("TeleportService")) or game:GetService("TeleportService")
+	local ok, response = pcall(function()
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer or game.Players.LocalPlayer)
+	end)
 
-	TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+	if not ok then
+		if getgenv().notify then
+			return getgenv().notify("Error", "An error occurred when trying to Rejoin: "..tostring(response), 6)
+		else
+			return 
+		end
+	end
 end)
 
 NoRainbowUI_Button.MouseButton1Click:Connect(function()
-	getgenv().rainbow_script = false
-	getgenv().rainbow_script = false
+	if not getgenv().rainbow_script then
+		return 
+	end
+
 	getgenv().rainbow_script = false
 end)
 
@@ -3261,7 +3702,7 @@ CopyInvite_Button.MouseButton1Click:Connect(function()
 	if everyClipboard then
 		everyClipboard("https://github.com/EnterpriseExperience/MicUpSource/wiki")
 	else
-		return SendNotify("Unsupported", "This executor does not support setclipboard.")
+		return SendNotify("Warning", "This executor does not support setclipboard.", 5)
 	end
 end)
 
@@ -3356,7 +3797,7 @@ Players.PlayerRemoving:Connect(function(player)
 	pcall(function()
 		if player.Name == TargetedPlayer then
 			UpdateTarget(nil)
-			SendNotify("System Broken","Targeted player left/rejoined.",5)
+			SendNotify("Info","Targeted player left/rejoined.",5)
 		end
 	end)
 end)
@@ -3371,7 +3812,7 @@ plr.CharacterAdded:Connect(function(x)
 		ChangeToggleColor(Fly_Button)
 		flying = false
 		Fly_Pad.Visible = false
-		SendNotify("System Broken","Fly was automatically disabled due to your character respawn",5)
+		SendNotify("Info","Fly was automatically disabled due to your character respawn.",5)
 	end
 end)
 
@@ -3379,19 +3820,18 @@ OpenClose.MouseButton1Click:Connect(function()
 	Background.Visible = not Background.Visible
 end)
 
-game:GetService("UserInputService").InputBegan:Connect(function(input,gameProcessedEvent)
+UserInputService.InputBegan:Connect(function(input,gameProcessedEvent)
 	if gameProcessedEvent then return end
 	if input.KeyCode == Enum.KeyCode.B then
 		Background.Visible = not Background.Visible
 	end
 end)
 wait(.3)
-SendNotify("Hello", tostring(LocalPlayer.DisplayName))
+SendNotify("Success", "Hello, "..tostring(LocalPlayer.DisplayName)..", how's it going?", 5)
 wait(0.5)
-local TweenService = cloneref and cloneref(game:GetService("TweenService")) or game:GetService("TweenService")
 local rainbowFrame = Background
 local tweenDuration = 0.45
-getgenv().rainbow_script = true
+getgenv().rainbow_script = getgenv().rainbow_script or true
 
 local rainbowColors = {
 	Color3.fromRGB(255, 0, 0),
@@ -3406,6 +3846,10 @@ local rainbowColors = {
 }
 
 local function tweenRainbow()
+	if getgenv().rainbow_script then
+		return 
+	end
+
    while getgenv().rainbow_script == true do
 		for i = 1, #rainbowColors do
 			local nextColor = rainbowColors[i]
